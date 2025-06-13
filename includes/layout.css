@@ -1,0 +1,210 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+a {
+  text-decoration: none;
+}
+ul {
+  list-style: none;
+}
+header {
+  position: sticky;
+  z-index: 999;
+  top: -10px;
+  background-color: #ffffff;
+}
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  margin: 10px 0;
+}
+/* logo---- */
+.header-container .logo {
+  width: 20%;
+}
+.logo a {
+  width: 50%;
+  overflow: hidden;
+}
+a .img {
+  width: 100%;
+}
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* menu ================*/
+.ul1 {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+}
+.li1 a,
+.li1 {
+  padding: 10px 10px;
+  font-weight: 600;
+  color: #91ac41;
+  transition: all 0.2s;
+}
+.ul1 .li1 a:hover {
+  color: indianred;
+}
+/* dùng before */
+.ul1 .li1 {
+  position: relative;
+}
+.ul1 > .li1 > a::before {
+  content: " ";
+  position: absolute;
+  width: 0;
+  bottom: 0;
+  height: 3px;
+  background-color: rgb(240, 29, 61);
+  transition: ease-in-out 0.6s;
+}
+.ul1 > .li1 > a:hover::before {
+  width: 50%;
+}
+/* menu cấp 2 */
+.li1 {
+  position: relative;
+  transition: all 0.2s;
+}
+
+.ul2 {
+  position: absolute;
+  margin-top: 10px;
+  width: 200px;
+  z-index: 999;
+
+  display: none;
+}
+.ul2 .li2 {
+  padding: 10px 20px;
+  margin-top: 5px;
+  background-color: #ffffff;
+  border-radius: 35px;
+  border: 1px solid rgb(173, 172, 172);
+}
+.ul2 .li2 a {
+  display: block;
+  padding: 10px 15px;
+}
+
+.limn:hover > .ul2 {
+  display: block;
+}
+/* menu cấp 3-------- */
+.limn2 {
+  position: relative;
+  transition: all 0.5s;
+}
+.ul3 {
+  position: absolute;
+  top: 100%;
+  width: 200px;
+  padding: 10px 20px;
+  z-index: 999;
+  display: none;
+}
+.li3 {
+  background-color: #ffffff;
+  border-radius: 35px;
+  border: 1px solid rgb(173, 172, 172);
+  margin-top: 5px;
+  padding: 10px 20px;
+}
+.li3 a {
+  padding: 10px 20px;
+  display: block;
+}
+.limn2:hover > .ul3 {
+  display: block;
+}
+/* menu cấp 4 */
+
+/* right */
+.right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 50px;
+}
+.icon {
+  padding: 5px;
+}
+.baotk {
+  padding: 0 10px 0 0;
+  margin-right: 20px;
+}
+.nuttk {
+  padding: 10px 40px;
+  border-radius: 18px;
+  position: relative;
+}
+/* .timkiem1 {
+} */
+
+.icon a {
+  color: #91ac41;
+}
+div.nut1 {
+  position: absolute !important;
+  top: 58px;
+  right: 170px;
+  transform: translateY(-50%);
+}
+.icon {
+  transition: all 0.2s;
+}
+.right .icon a:hover {
+  color: indianred;
+}
+
+/* ======header========================= */
+
+/* footer============================= */
+footer {
+  display: flex;
+  margin: 40px 0px;
+  background-color: #f8f8f8;
+  height: auto;
+  padding-top: 15px;
+}
+footer .d1 {
+  width: 40%;
+  padding-left: 20px;
+  margin: 20px 20px;
+}
+footer .d2 {
+  width: 20%;
+  padding-left: 20px;
+  margin: 20px 20px;
+}
+.ke {
+  width: 498px;
+  height: 2px;
+  margin: 10px 0px 20px 0px;
+  background-color: #ffffff;
+}
+.dt,
+.tw,
+.in,
+.dt,
+.mel {
+  padding-top: 20px;
+}
+footer .anhlogo {
+  width: 30%;
+}
+.anhlogo .imgx {
+  width: 100%;
+  height: auto;
+}
+.imgx img {
+  width: 350px;
+  height: 390px;
+}
