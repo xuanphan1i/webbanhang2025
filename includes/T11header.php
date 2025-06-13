@@ -2,6 +2,9 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
+// số lương koaij mặt hàng có trong giỏ
+$so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,7 +77,11 @@ if (session_status() == PHP_SESSION_NONE) {
                         </div>
                     </div>
                     
-                    <div class="icon"><a href=""><i class="fas fa-cart-plus"></i></a></div>
+                    <div class="icon icon-cart"><a href="../public/giohang.php"><i class="fas fa-cart-plus"></i>
+                        <?php if ($so_loai_sp > 0): ?>
+                        <span class="cart-count"><?= $so_loai_sp ?></span>
+                        <?php endif; ?>
+                    </a></div>
                     <!-- <div class="icon"><a href=""><i class="fas fa-heart"></i></a></div> -->
                     <!-- đăng nhập đăng xuất  -->
                     <div class="icon"> 

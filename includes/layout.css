@@ -164,6 +164,27 @@ div.nut1 {
   color: indianred;
 }
 
+/* giỏ hàng */
+.icon-cart {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+}
+.icon-cart i {
+  font-size: 24px;
+  color: #333;
+}
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
 /* ======header========================= */
 
 /* footer============================= */

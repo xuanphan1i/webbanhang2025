@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once '../config/config.php';
 
 if (isset($_GET['id'])) {
@@ -27,6 +28,7 @@ if (isset($_GET['id'])) {
 
 </head>
 <body>
+  <?php require '../includes/T11header.php'?>
     <div id="khung">
         <div class="h22"><h2>Chi tiết sản phẩm</h2></div>
         <!-- Nút quay lại -->
@@ -49,14 +51,19 @@ if (isset($_GET['id'])) {
             <label for="sl">Số lượng:</label>
             <input type="number" name="sl" id="sl" value="1" min="1" max="10" />
             </div>
-            <!-- Truyền thêm thông tin sản phẩm (ẩn) -->
+           
+            <form action="giohang.php" method="POST">
+               <!-- Truyền thêm thông tin sản phẩm (ẩn) -->
             <input type="hidden" name="id" value="<?= $sp['id'] ?>">
             <input type="hidden" name="ten" value="<?= htmlspecialchars($sp['ten']) ?>">
             <input type="hidden" name="gia" value="<?= $sp['gia'] ?>">
             <input type="hidden" name="hinh_anh" value="<?= htmlspecialchars($sp['hinh_anh']) ?>">
+            <input type="hidden" name="soluong" value="1">
 
-            <!-- Nút thêm vào giỏ -->
-            <button type="submit" class="btn-them">Thêm vào giỏ hàng</button>
+              <!-- Nút thêm vào giỏ -->
+              <button type="submit" name="them_gio" class="btn-them">Thêm vào giỏ hàng</button>
+          </form>
+
         </div>
         </div>
         <?php else: ?>
