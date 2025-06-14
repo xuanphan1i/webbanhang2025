@@ -40,6 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['ten'];
         $_SESSION['user_role'] = $user['vai_tro'];
+    // ✅ Thêm đoạn này để giữ giỏ hàng nếu trước đó đã thêm
+        if (!isset($_SESSION['giohang'])) {
+            $_SESSION['giohang'] = [];
+        }
 
         echo "<script>alert('Đăng nhập thành công!');";
             if ($user['vai_tro'] == 'admin') {

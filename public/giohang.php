@@ -21,7 +21,7 @@ if (isset($_POST['them_gio'])) {
     exit;
 }
 
-// XỬ LÝ XÓA SẢN PHẨM
+// XÓA SẢN PHẨM
 if (isset($_GET['xoa'])) {
     $index = $_GET['xoa'];
     unset($_SESSION['giohang'][$index]);
@@ -30,7 +30,7 @@ if (isset($_GET['xoa'])) {
     exit;
 }
 
-// CẬP NHẬT SỐ LƯỢNG QUA GET
+// CẬP NHẬT SỐ LƯỢNG
 if (isset($_GET['capnhat'])) {
     $index = $_GET['capnhat'];
     $so_luong_moi = $_GET['soluong'] ?? null;
@@ -38,6 +38,31 @@ if (isset($_GET['capnhat'])) {
         $_SESSION['giohang'][$index]['soluong'] = $so_luong_moi;
     }
     header("Location: giohang.php");
+    exit;
+}
+
+// ĐẶT HÀNG
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dathang'])) {
+    // 1. Kiểm tra đăng nhập
+    if (!isset($_SESSION['user_id'])) {
+        echo "<script>alert('Bạn cần đăng nhập để đặt hàng');</script>";
+        exit;
+    }
+
+    // 2. Kiểm tra giỏ hàng
+    if (!isset($_SESSION['giohang']) || count($_SESSION['giohang']) === 0) {
+        echo "<script>alert('Giỏ hàng đang trống!');</script>";
+        exit;
+    }
+
+    // 3. Kiểm tra có chọn sản phẩm không
+    if (!isset($_POST['chon_sp']) || count($_POST['chon_sp']) === 0) {
+        echo "<script>alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng');</script>";
+        exit;
+    }
+
+    // Gửi sang trang xử lý đặt hàng
+    header('Location: dathang.php');
     exit;
 }
 ?>
@@ -63,7 +88,7 @@ if (isset($_GET['capnhat'])) {
 </div>
 
 <div class="baoform">
-    <form method="POST">
+    <form method="POST" id="formCheckbox">
         <table border="1" cellpadding="8" cellspacing="0" style="width: 100%;">
             <tr>
                 <th><input type="checkbox" id="chon_tatca" onclick="toggleCheckboxes(this)"></th>
@@ -84,18 +109,17 @@ if (isset($_GET['capnhat'])) {
                     $tong += $tien;
 
                     echo '<tr>
-                        <td><input type="checkbox" name="chon_sp[]" value="' . $index . '"></td>
+                        <td><input type="checkbox" name="chon_sp[]" value="' . htmlspecialchars($index) . '"></td>
                         <td>' . ($index + 1) . '</td>
-                        <td><img src="' . $sp['hinh_anh'] . '" width="50"></td>
-                        <td>' . $sp['ten'] . '</td>
-                        <td>' . $sp['gia'] . '</td>
+                        <td><img src="' . htmlspecialchars($sp['hinh_anh']) . '" width="50"></td>
+                        <td>' . htmlspecialchars($sp['ten']) . '</td>
+                        <td>' . htmlspecialchars($sp['gia']) . '</td>
                         <td><input type="number" id="soluong_' . $index . '" value="' . $sp['soluong'] . '" min="1"></td>
                         <td>' . $tien . '</td>
                         <td>
                             <a href="giohang.php?xoa=' . $index . '">Xóa</a><br>
                             <a href="#" onclick="capNhatSoLuong(' . $index . ')">Cập nhật</a>
                         </td>
-
                     </tr>';
                 }
             } else {
@@ -105,25 +129,27 @@ if (isset($_GET['capnhat'])) {
         </table>
     </form>
 </div>
-    <!-- ✅ Thanh cố định cuối màn hình -->
-    <div class="thanh-cuoi-man-hinh">
-        <form method="POST">
-            <!-- <button type="submit" name="capnhat">Cập nhật số lượng</button> -->
 
-            <button type="submit" name="dathang"
-                id="nutDatHang"
-                <?php if (!isset($_SESSION['user'])) echo 'disabled'; ?>>
-                Đặt hàng
-            </button>
-        </form>
-    </div>
+<!-- ✅ Thanh cố định cuối màn hình -->
+<div class="thanh-cuoi-man-hinh">
+    <form method="POST" id="formDatHang" onsubmit="return copyCheckboxes()">
+        <button type="submit" name="dathang"
+            id="nutDatHang"
+            <?php if (!isset($_SESSION['user_id'])) echo 'disabled'; ?>>
+            Đặt hàng
+        </button>
+    </form>
+</div>
+
 <!-- ✅ JavaScript -->
 <script>
+// Chọn tất cả
 function toggleCheckboxes(master) {
     const checkboxes = document.querySelectorAll("input[name='chon_sp[]']");
     checkboxes.forEach(cb => cb.checked = master.checked);
 }
 
+// Cập nhật số lượng
 function capNhatSoLuong(index) {
     const input = document.getElementById('soluong_' + index);
     const soLuongMoi = input.value;
@@ -133,9 +159,50 @@ function capNhatSoLuong(index) {
         alert('Số lượng phải lớn hơn 0');
     }
 }
+
+// Kiểm tra checkbox bật/tắt nút đặt hàng
+<?php if (isset($_SESSION['user_id'])): ?>
+    const nutDatHang = document.getElementById('nutDatHang');
+    const checkboxes = document.querySelectorAll('input[name="chon_sp[]"]');
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            const checkedCount = document.querySelectorAll('input[name="chon_sp[]"]:checked').length;
+            nutDatHang.disabled = (checkedCount === 0);
+        });
+    });
+<?php endif; ?>
+
+// Sao chép checkbox đã chọn từ form 1 sang form 2
+function copyCheckboxes() {
+    const form1 = document.getElementById('formCheckbox');
+    const form2 = document.getElementById('formDatHang');
+
+    // Xóa checkbox cũ trong form2
+    form2.querySelectorAll('input[name="chon_sp[]"]').forEach(el => el.remove());
+
+    const checked = form1.querySelectorAll('input[name="chon_sp[]"]:checked');
+
+    if (checked.length === 0) {
+        alert("Vui lòng chọn ít nhất một sản phẩm để đặt hàng.");
+        return false;
+    }
+
+    // Tạo input hidden tương ứng trong form2
+    checked.forEach(cb => {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'chon_sp[]';
+        hiddenInput.value = cb.value;
+        form2.appendChild(hiddenInput);
+    });
+
+    return true;
+}
 </script>
 </body>
 </html>
+
 
 <style>
     .baoform{
