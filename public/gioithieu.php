@@ -167,7 +167,7 @@
     <div class="uu_dai" style="margin-top: 90px">
       <div class="giam_gia_soc">
         <div class="giam1">Giảm giá sốc!</div>
-        <div class="giam2">Cửa hàng Oars Ưu đãi giảm giá 50%</div>
+        <div class="giam2">Cửa hàng Oars Ưu đãi giảm giá 50% khi mua tại cửa hàng</div>
         <img src="../img/main/la2.png" alt="" />
         <div class="xem_ngay">
           <a href=" " class="a_xem"> </a>
