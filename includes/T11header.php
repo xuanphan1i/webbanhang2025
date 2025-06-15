@@ -5,6 +5,19 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // số lương koaij mặt hàng có trong giỏ
 $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
+// $so_don = 0;
+// if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'nguoidung' && isset($_SESSION['user_id'])) {
+//     require_once '../config/config.php'; // đảm bảo đã kết nối CSDL
+
+//     $user_id = $_SESSION['user_id'];
+//     $sql = "SELECT COUNT(*) AS tong FROM don_hang WHERE khach_hang_id = ?";
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bind_param("i", $user_id);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+//     $row = $result->fetch_assoc();
+//     $so_don = $row['tong'];
+// }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,12 +48,16 @@ $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
             <div class="menu-main"> 
                 <div class="menu">
                     <ul class="ul1">
+                        <!--hiện thêm li admin khi admin đăng nhập  -->
                          <?php 
-    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') 
- {
-        echo '<li class="li1"><a href="../admin/index.php">ADMIN</a></li>';
-    }
-    ?>
+                            if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') 
+                        {
+                                echo '<li class="li1"><a href="../admin/index.php">ADMIN</a></li>';
+                            }
+                            ?>
+                        
+
+
                         <li class="li1"><a href="../public/index.php">TRANG CHỦ</a></li>
                         <li class="li1"><a href="../public/gioithieu.php">GIỚI THIỆU</a></li>
                         <li class="li1 limn"><a href="../public/sanpham.php">SẢN PHẨM</a>
@@ -78,10 +95,23 @@ $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
                     </div>
                     
                     <div class="icon icon-cart"><a href="../public/giohang.php"><i class="fas fa-cart-plus"></i>
+                    
                         <?php if ($so_loai_sp > 0): ?>
                         <span class="cart-count"><?= $so_loai_sp ?></span>
                         <?php endif; ?>
                     </a></div>
+                    <!-- Icon đơn hàng của tôi (chỉ hiện khi đã đăng nhập với vai trò người dùng) -->
+                    <?php 
+                        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'nguoidung') {
+                            
+                            echo '
+                            <div class="icon icon-orders">
+                                <a href="../public/donhang_cua_toi.php" title="Đơn hàng của tôi">
+                                    <i class=" icon fas fa-box"></i>
+                                </a>
+                            </div>';
+                        }
+                    ?>
                     <!-- <div class="icon"><a href=""><i class="fas fa-heart"></i></a></div> -->
                     <!-- đăng nhập đăng xuất  -->
                     <div class="icon"> 
