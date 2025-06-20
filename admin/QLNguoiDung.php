@@ -116,7 +116,7 @@ $result = $conn->query($sql);
             <label>Số điện thoại:</label><br>
             <input type="text" name="so_dien_thoai" pattern="[0-9]{10}" maxlength="10" value="<?= htmlspecialchars($nguoi_dung_sua['so_dien_thoai']) ?>" required><br><br>
 
-            <button type="submit" name="sua_nguoi_dung">Cập nhật</button>
+            <button type="submit" name="sua_nguoi_dung">Sửa</button>
             <a href="QLNguoiDung.php" style="margin-left: 10px;">
                 <button type="button">Hủy</button>
             </a>

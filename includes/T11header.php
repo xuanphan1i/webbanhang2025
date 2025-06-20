@@ -5,19 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // số lương koaij mặt hàng có trong giỏ
 $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
-// $so_don = 0;
-// if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'nguoidung' && isset($_SESSION['user_id'])) {
-//     require_once '../config/config.php'; // đảm bảo đã kết nối CSDL
 
-//     $user_id = $_SESSION['user_id'];
-//     $sql = "SELECT COUNT(*) AS tong FROM don_hang WHERE khach_hang_id = ?";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bind_param("i", $user_id);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-//     $row = $result->fetch_assoc();
-//     $so_don = $row['tong'];
-// }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -86,13 +74,21 @@ $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
             <!-- right -->
             <div class="right-main">
                 <div class="right">
-                    <div class="baotk icon">
-                        <div class="timkiem1">
-                            <input type="text" placeholder="Tìm kiếm..." class="nuttk">                
-                            
-                            <div class="nut1"> <a href="" ><i class="fas fa-search "></i></a></div>
+                   <form method="GET" action="../admin/QLSP.php" id="form-timkiem" class="baotk icon">
+                    <div class="timkiem1">
+                        <!-- THÊM name="tu_khoa" để truyền dữ liệu -->
+                        <input type="text" name="tu_khoa" id="input-timkiem" placeholder="Tìm kiếm..." class="nuttk">
+
+
+                        <div class="nut1">
+                            <!-- Giữ nguyên <a>, nhưng thêm id -->
+                            <a href="#" id="nut-tim"><i class="fas fa-search"></i></a>
                         </div>
                     </div>
+                    <div id="ketqua-timkiem" class="dropdown-timkiem"></div>
+
+                    </form>
+
                     
                     <div class="icon icon-cart"><a href="../public/giohang.php"><i class="fas fa-cart-plus"></i>
                     
@@ -102,7 +98,7 @@ $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
                     </a></div>
                     <!-- Icon đơn hàng của tôi (chỉ hiện khi đã đăng nhập với vai trò người dùng) -->
                     <?php 
-                        if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'nguoidung') {
+                        if (isset($_SESSION['user_role']) ) {
                             
                             echo '
                             <div class="icon icon-orders">
@@ -136,6 +132,35 @@ $so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
     </header>
    
 
+<!-- Cuối file, trước </body> -->
+<script>
+    const input = document.getElementById("input-timkiem");
+    const ketquaBox = document.getElementById("ketqua-timkiem");
+
+    input.addEventListener("input", function () {
+        let tukhoa = input.value.trim();
+        if (tukhoa.length === 0) {
+            ketquaBox.innerHTML = "";
+            ketquaBox.style.display = "none";
+            return;
+        }
+
+        fetch(`../public/timkiem.php?tukhoa=${encodeURIComponent(tukhoa)}`)
+            .then(response => response.text())
+            .then(data => {
+                ketquaBox.innerHTML = data;
+                ketquaBox.style.display = "block";
+            });
+    });
+
+    // Ẩn khung tìm khi click ra ngoài
+    document.addEventListener("click", function (e) {
+        if (!document.getElementById("form-timkiem").contains(e.target)) {
+            ketquaBox.innerHTML = "";
+            ketquaBox.style.display = "none";
+        }
+    });
+</script>
 
 
 </body>

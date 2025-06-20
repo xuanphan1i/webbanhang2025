@@ -1,6 +1,27 @@
 <?php
 session_start();
 require_once '../config/config.php';
+// Kiểm tra đăng nhập và quyền admin
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
+    header("Location: ../public/login.php");
+    exit;
+}
+
+//tìm kiếm sp
+$tu_khoa = isset($_GET['tu_khoa']) ? trim($_GET['tu_khoa']) : '';
+
+// Nếu có từ khóa tìm kiếm
+if ($tu_khoa !== '') {
+    $stmt = $conn->prepare("SELECT * FROM san_pham WHERE ten LIKE ?");
+    $like = "%" . $tu_khoa . "%";
+    $stmt->bind_param("s", $like);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} else {
+    // Không có từ khóa thì hiện toàn bộ sản phẩm
+    $result = $conn->query("SELECT * FROM san_pham");
+}
+
 
 // Lấy danh sách sản phẩm từ CSDL
 $sql = "SELECT * FROM san_pham ORDER BY id ASC";

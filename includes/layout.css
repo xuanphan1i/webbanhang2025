@@ -131,7 +131,7 @@ a .img {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 50px;
+  margin-right: 10px;
 }
 .icon {
   padding: 5px;
@@ -175,6 +175,28 @@ div.nut1 {
 .right .icon a:hover {
   color: indianred;
 }
+/* hiển thị danh sách sau khi clicl tìm kiếm */
+#ketqua-timkiem {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  width: 100%;
+  z-index: 999;
+  display: none;
+  max-height: 250px;
+  overflow-y: auto;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.item-timkiem {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.item-timkiem:hover {
+  background-color: #f0f0f0;
+}
 
 /* giỏ hàng */
 .icon-cart {
@@ -208,20 +230,19 @@ div.nut1 {
 }
 /* đơn hàng của tôi */
 .icon-orders {
-    position: relative;
+  position: relative;
 }
 
 .icon-orders .order-count {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    background-color: red;
-    color: white;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 50%;
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
 }
-
 
 /* ======header========================= */
 

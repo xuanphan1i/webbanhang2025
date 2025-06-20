@@ -28,10 +28,10 @@ if (isset($_POST['capnhat'])) {
                   WHERE id = $id";
 
     if (mysqli_query($conn, $sqlUpdate)) {
-        echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href = '../QLSP.php';</script>";
+        echo "<script>alert('Sửa sản phẩm thành công!'); window.location.href = '../QLSP.php';</script>";
         exit;
     } else {
-        echo "Lỗi cập nhật: " . mysqli_error($conn);
+        echo "Lỗi sửa: " . mysqli_error($conn);
     }
 }
 ?>
@@ -74,7 +74,7 @@ if (isset($_POST['capnhat'])) {
                     <option value="traicay" <?= $sp['danhmuc'] == 'traicay' ? 'selected' : '' ?>>Trái Cây</option>
                 </select><br><br>
 
-                <button type="submit" name="capnhat">Cập nhật</button>
+                <button type="submit" name="capnhat">Sửa</button>
                 <a href="../QLSP.php"><button type="button">Hủy</button></a>
             </form>
         </div>

@@ -163,7 +163,7 @@ $giohang = $_SESSION['giohang'];
         <label for="ghi_chu">Ghi chú đơn hàng</label>
         <textarea name="ghi_chu" id="ghi_chu" rows="4" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
 
-        <button type="submit" class="dat-hang-btn">Xác nhận đặt hàng</button>
+        <button type="submit" class="dat-hang-btn btn-quay-lai">Xác nhận đặt hàng</button>
     </form>
 </body>
 </html>
