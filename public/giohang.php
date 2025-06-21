@@ -1,45 +1,126 @@
 <?php
 session_start();
 
+include '../config/config.php';
+
+$ds_gio_hang = [];
+// hiển thị sp từ bảng giỏ hàng ra giỏ hàng
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+
+    $sql = "SELECT gh.san_pham_id, gh.so_luong, sp.ten, sp.gia, sp.hinh_anh 
+            FROM gio_hang gh
+            JOIN san_pham sp ON gh.san_pham_id = sp.id
+            WHERE gh.user_id = $user_id";
+    $result = $conn->query($sql);
+
+    while ($row = $result->fetch_assoc()) {
+        $ds_gio_hang[] = $row;
+    }
+} else {
+    // Nếu chưa đăng nhập, lấy từ session
+    $ds_gio_hang = $_SESSION['giohang'] ?? [];
+}
+
 // XỬ LÝ THÊM SẢN PHẨM
 if (isset($_POST['them_gio'])) {
-    $sp = [
-        'id' => $_POST['id'],
-        'ten' => $_POST['ten'],
-        'gia' => $_POST['gia'],
-        'hinh_anh' => $_POST['hinh_anh'],
-        'soluong' => $_POST['soluong']
-    ];
+    $sp_id = (int)$_POST['id'];
+    $so_luong = (int)$_POST['soluong'];
 
-    if (!isset($_SESSION['giohang'])) {
-        $_SESSION['giohang'] = [];
+    if (isset($_SESSION['user_id'])) {
+        // ✅ Nếu đã đăng nhập: lưu vào CSDL
+        $user_id = $_SESSION['user_id'];
+
+        // Kiểm tra sản phẩm đã có trong giỏ chưa
+        $stmt = $conn->prepare("SELECT * FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+        $stmt->bind_param("ii", $user_id, $sp_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Cập nhật số lượng nếu đã có
+            $stmt = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
+            $stmt->bind_param("iii", $so_luong, $user_id, $sp_id);
+        } else {
+            // Thêm mới
+            $stmt = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
+            $stmt->bind_param("iii", $user_id, $sp_id, $so_luong);
+        }
+
+        $stmt->execute();
+        $stmt->close();
+
+    } else {
+        // ❗ Nếu chưa đăng nhập → lưu vào SESSION
+        $sp = [
+                'san_pham_id' => $sp_id,
+                'ten' => $_POST['ten'],
+                'gia' => $_POST['gia'],
+                'hinh_anh' => $_POST['hinh_anh'],
+                'so_luong' => $so_luong
+            ];
+
+
+        if (!isset($_SESSION['giohang'])) {
+            $_SESSION['giohang'] = [];
+        }
+
+        // Nếu đã có thì cộng dồn
+        if (isset($_SESSION['giohang'][$sp_id])) {
+            $_SESSION['giohang'][$sp_id]['so_luong'] += $so_luong;
+        } else {
+            $_SESSION['giohang'][$sp_id] = $sp;
+        }
     }
-
-    $_SESSION['giohang'][] = $sp;
 
     header("Location: giohang.php?success=1");
     exit;
 }
 
+
 // XÓA SẢN PHẨM
 if (isset($_GET['xoa'])) {
-    $index = $_GET['xoa'];
-    unset($_SESSION['giohang'][$index]);
-    $_SESSION['giohang'] = array_values($_SESSION['giohang']); // Reset key
+    $san_pham_id = $_GET['xoa'];
+
+    if (isset($_SESSION['user_id'])) {
+        // Người dùng đã đăng nhập → xóa trong DB
+        $stmt = $conn->prepare("DELETE FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+        $stmt->bind_param("ii", $_SESSION['user_id'], $san_pham_id);
+        $stmt->execute();
+        $stmt->close();
+    } else {
+        // Nếu chưa đăng nhập → xóa trong session
+        unset($_SESSION['giohang'][$san_pham_id]);
+        $_SESSION['giohang'] = array_values($_SESSION['giohang']);
+    }
+
     header("Location: giohang.php");
     exit;
 }
 
+
 // CẬP NHẬT SỐ LƯỢNG
 if (isset($_GET['capnhat'])) {
-    $index = $_GET['capnhat'];
+    $san_pham_id = $_GET['capnhat'];
     $so_luong_moi = $_GET['soluong'] ?? null;
-    if (is_numeric($index) && is_numeric($so_luong_moi) && $so_luong_moi > 0) {
-        $_SESSION['giohang'][$index]['soluong'] = $so_luong_moi;
+
+    if (is_numeric($san_pham_id) && is_numeric($so_luong_moi) && $so_luong_moi > 0) {
+        if (isset($_SESSION['user_id'])) {
+            // Người dùng đã đăng nhập → cập nhật trong DB
+            $stmt = $conn->prepare("UPDATE gio_hang SET so_luong = ? WHERE user_id = ? AND san_pham_id = ?");
+            $stmt->bind_param("iii", $so_luong_moi, $_SESSION['user_id'], $san_pham_id);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            // Nếu chưa đăng nhập → cập nhật trong session
+            $_SESSION['giohang'][$san_pham_id]['soluong'] = $so_luong_moi;
+        }
     }
+
     header("Location: giohang.php");
     exit;
 }
+
 
 // ĐẶT HÀNG
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dathang'])) {
@@ -103,24 +184,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dathang'])) {
 
             <?php
             $tong = 0;
-            if (!empty($_SESSION['giohang'])) {
-                foreach ($_SESSION['giohang'] as $index => $sp) {
-                    $tien = $sp['gia'] * $sp['soluong'];
+            if (!empty($ds_gio_hang)) {
+                foreach ($ds_gio_hang as $index => $sp) {
+                    $tien = $sp['gia'] * $sp['so_luong']; // dùng đúng tên từ DB
                     $tong += $tien;
 
                     echo '<tr>
-                        <td><input type="checkbox" name="chon_sp[]" value="' . htmlspecialchars($index) . '"></td>
-                        <td>' . ($index + 1) . '</td>
-                        <td><img src="' . htmlspecialchars($sp['hinh_anh']) . '" width="50"></td>
-                        <td>' . htmlspecialchars($sp['ten']) . '</td>
-                        <td>' . htmlspecialchars($sp['gia']) . '</td>
-                        <td><input type="number" id="soluong_' . $index . '" value="' . $sp['soluong'] . '" min="1"></td>
-                        <td>' . $tien . '</td>
-                        <td>
-                            <a href="giohang.php?xoa=' . $index . '">Xóa</a><br>
-                            <a href="#" onclick="capNhatSoLuong(' . $index . ')">Cập nhật</a>
-                        </td>
-                    </tr>';
+    <td><input type="checkbox" name="chon_sp[]" value="' . htmlspecialchars($sp['san_pham_id']) . '"></td>
+    <td>' . ($index + 1) . '</td>
+    <td><img src="' . htmlspecialchars($sp['hinh_anh']) . '" width="50"></td>
+    <td>' . htmlspecialchars($sp['ten']) . '</td>
+    <td>' . number_format($sp['gia']) . '</td>
+    <td><input type="number" id="soluong_' . $sp['san_pham_id'] . '" value="' . $sp['so_luong'] . '" min="1"></td>
+    <td>' . number_format($tien) . '</td>
+    <td>
+        <a href="giohang.php?xoa=' . $sp['san_pham_id'] . '">Xóa</a><br>
+        <a href="#" onclick="capNhatSoLuong(' . $sp['san_pham_id'] . ')">Cập nhật</a>
+    </td>
+</tr>';
+
                 }
             } else {
                 echo '<tr><td colspan="8">Giỏ hàng trống</td></tr>';

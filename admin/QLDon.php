@@ -142,7 +142,7 @@ if ($result->num_rows > 0) {
         echo "<td>" . htmlspecialchars($don['ghi_chu']) . "</td>";
         echo "<td>" . implode(", ", $don['san_phams']) . "</td>"; // Sản phẩm gộp
         echo "<td>
-                <a href='QLDon.php?action=sua&id=" . $don['id'] . "'>Sửa</a> |
+                <a href='QLDon.php?action=sua&id=" . $don['id'] . "'>Sửa</a> 
                 <a href='QLDon.php?action=xoa&id=" . $don['id'] . "' onclick=\"return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');\">Xóa</a>
               </td>";
         echo "</tr>";

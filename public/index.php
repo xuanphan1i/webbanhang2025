@@ -1,6 +1,7 @@
 <?php
 require_once('../config/config.php'); // điều chỉnh đường dẫn nếu cần
 
+
 $sql = "SELECT * FROM san_pham ORDER BY RAND() LIMIT 12";
 $result = mysqli_query($conn, $sql);
 ?>

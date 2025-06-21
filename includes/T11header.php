@@ -2,11 +2,13 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+$so_loai_sp = 0;
 
-// số lương koaij mặt hàng có trong giỏ
-$so_loai_sp = isset($_SESSION['giohang']) ? count($_SESSION['giohang']) : 0;
-
+if (isset($_SESSION['giohang']) && is_array($_SESSION['giohang'])) {
+    $so_loai_sp = count($_SESSION['giohang']);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

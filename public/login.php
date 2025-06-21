@@ -40,11 +40,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['ten'];
         $_SESSION['user_role'] = $user['vai_tro'];
-    // ✅ Thêm đoạn này để giữ giỏ hàng nếu trước đó đã thêm
-        if (!isset($_SESSION['giohang'])) {
-            $_SESSION['giohang'] = [];
+        // ✅ Thêm đoạn này để giữ giỏ hàng sau khi đăng nhập nếu trước đó đã thêm và lưu giỏ đó vào database 
+        if (isset($_SESSION['giohang']) && !empty($_SESSION['giohang'])) {
+            foreach ($_SESSION['giohang'] as $sp) {
+                $id_sp = $sp['id']; // ✅ Lấy đúng id sản phẩm
+               $so_luong = isset($sp['soluong']) ? (int)$sp['soluong'] : 1; // Gán mặc định là 1 nếu không có
+
+
+                // Kiểm tra đã có trong DB chưa
+                $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+                $stmt->bind_param("ii", $_SESSION['user_id'], $id_sp);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result->num_rows > 0) {
+                    // Cập nhật số lượng
+                    $stmt_update = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
+                    $stmt_update->bind_param("iii", $so_luong, $_SESSION['user_id'], $id_sp);
+                    $stmt_update->execute();
+                    $stmt_update->close();
+                } else {
+                    // Thêm mới
+                    $stmt_insert = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
+                    $stmt_insert->bind_param("iii", $_SESSION['user_id'], $id_sp, $so_luong);
+                    $stmt_insert->execute();
+                    $stmt_insert->close();
+                }
+
+                $stmt->close();
+            }
+
+            // ✅ Xoá session giỏ hàng sau khi chuyển
+            unset($_SESSION['giohang']);
         }
 
+
+        
+        // đủ đk đăng nhập
         echo "<script>alert('Đăng nhập thành công!');";
             if ($user['vai_tro'] == 'admin') {
                 echo "window.location.href = '../admin/index.php';";
