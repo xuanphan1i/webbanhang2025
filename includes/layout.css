@@ -197,6 +197,14 @@ div.nut1 {
 .item-timkiem:hover {
   background-color: #f0f0f0;
 }
+.nuttk {
+    border: 1px solid #ccc;         /* Viền xám nhạt */
+    outline: none;                  /* Xóa viền xanh khi focus */
+    border-radius: 4px;             /* Bo góc nhẹ nếu cần */
+    padding: 6px 10px;              /* Padding gọn gàng */
+    font-size: 15px;
+}
+
 
 /* giỏ hàng */
 .icon-cart {

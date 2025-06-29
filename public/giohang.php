@@ -2,7 +2,11 @@
 session_start();
 
 include '../config/config.php';
-
+if (!isset($_SESSION['user_id'])) {
+    // ❌ Chưa đăng nhập → chuyển về trang đăng nhập (hoặc hiện thông báo)
+    echo "<script>alert('⚠️ Vui lòng đăng nhập để xem giỏ hàng'); window.location.href = 'login.php';</script>";
+    exit;
+}
 $ds_gio_hang = [];
 // hiển thị sp từ bảng giỏ hàng ra giỏ hàng
 if (isset($_SESSION['user_id'])) {
@@ -22,60 +26,8 @@ if (isset($_SESSION['user_id'])) {
     $ds_gio_hang = $_SESSION['giohang'] ?? [];
 }
 
-// XỬ LÝ THÊM SẢN PHẨM
-if (isset($_POST['them_gio'])) {
-    $sp_id = (int)$_POST['id'];
-    $so_luong = (int)$_POST['soluong'];
-
-    if (isset($_SESSION['user_id'])) {
-        // ✅ Nếu đã đăng nhập: lưu vào CSDL
-        $user_id = $_SESSION['user_id'];
-
-        // Kiểm tra sản phẩm đã có trong giỏ chưa
-        $stmt = $conn->prepare("SELECT * FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
-        $stmt->bind_param("ii", $user_id, $sp_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            // Cập nhật số lượng nếu đã có
-            $stmt = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
-            $stmt->bind_param("iii", $so_luong, $user_id, $sp_id);
-        } else {
-            // Thêm mới
-            $stmt = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
-            $stmt->bind_param("iii", $user_id, $sp_id, $so_luong);
-        }
-
-        $stmt->execute();
-        $stmt->close();
-
-    } else {
-        // ❗ Nếu chưa đăng nhập → lưu vào SESSION
-        $sp = [
-                'san_pham_id' => $sp_id,
-                'ten' => $_POST['ten'],
-                'gia' => $_POST['gia'],
-                'hinh_anh' => $_POST['hinh_anh'],
-                'so_luong' => $so_luong
-            ];
 
 
-        if (!isset($_SESSION['giohang'])) {
-            $_SESSION['giohang'] = [];
-        }
-
-        // Nếu đã có thì cộng dồn
-        if (isset($_SESSION['giohang'][$sp_id])) {
-            $_SESSION['giohang'][$sp_id]['so_luong'] += $so_luong;
-        } else {
-            $_SESSION['giohang'][$sp_id] = $sp;
-        }
-    }
-
-    header("Location: giohang.php?success=1");
-    exit;
-}
 
 
 // XÓA SẢN PHẨM
@@ -130,11 +82,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dathang'])) {
         exit;
     }
 
-    // 2. Kiểm tra giỏ hàng
-    if (!isset($_SESSION['giohang']) || count($_SESSION['giohang']) === 0) {
-        echo "<script>alert('Giỏ hàng đang trống!');</script>";
+   
+    // 2. Kiểm tra giỏ hàng (tùy theo đã đăng nhập hay chưa)
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $stmt = $conn->prepare("SELECT COUNT(*) AS tong FROM gio_hang WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+
+    if ($result['tong'] == 0) {
+        echo "<script>alert('Giỏ hàng của bạn đang trống!');</script>";
         exit;
     }
+} else {
+    // Nếu chưa đăng nhập thì kiểm tra trong session
+    if (!isset($_SESSION['giohang']) || count($_SESSION['giohang']) === 0) {
+        echo "<script>alert('Giỏ hàng của bạn đang trống!');</script>";
+        exit;
+    }
+}
+
 
     // 3. Kiểm tra có chọn sản phẩm không
     if (!isset($_POST['chon_sp']) || count($_POST['chon_sp']) === 0) {
@@ -214,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dathang'])) {
 
 <!-- ✅ Thanh cố định cuối màn hình -->
 <div class="thanh-cuoi-man-hinh">
-    <form method="POST" id="formDatHang" onsubmit="return copyCheckboxes()">
+    <form action="dathang.php" method="POST" id="formDatHang" onsubmit="return copyCheckboxes()">
         <button type="submit" name="dathang"
             id="nutDatHang"
             <?php if (!isset($_SESSION['user_id'])) echo 'disabled'; ?>>

@@ -91,13 +91,25 @@ if (isset($_SESSION['giohang']) && is_array($_SESSION['giohang'])) {
 
                     </form>
 
-                    
-                    <div class="icon icon-cart"><a href="../public/giohang.php"><i class="fas fa-cart-plus"></i>
-                    
+                    <!-- giỏ hàng -->
+                    <div class="icon icon-cart">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a href="../public/giohang.php">
+                        <i class="fas fa-cart-plus"></i>
                         <?php if ($so_loai_sp > 0): ?>
-                        <span class="cart-count"><?= $so_loai_sp ?></span>
+                            <span class="cart-count"><?= $so_loai_sp ?></span>
                         <?php endif; ?>
-                    </a></div>
+                        </a>
+                    <?php else: ?>
+                        <a href="#" onclick="alert('🔒 Bạn cần đăng nhập để xem giỏ hàng!'); return false;">
+                        <i class="fas fa-cart-plus"></i>
+                        <?php if ($so_loai_sp > 0): ?>
+                            <span class="cart-count"><?= $so_loai_sp ?></span>
+                        <?php endif; ?>
+                        </a>
+                    <?php endif; ?>
+                    </div>
+
                     <!-- Icon đơn hàng của tôi (chỉ hiện khi đã đăng nhập với vai trò người dùng) -->
                     <?php 
                         if (isset($_SESSION['user_role']) ) {

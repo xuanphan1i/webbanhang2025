@@ -1,13 +1,50 @@
 <?php
 session_start();
+require '../config/config.php'; // kết nối CSDL
 
-// Kiểm tra giỏ hàng
-if (!isset($_SESSION['giohang']) || count($_SESSION['giohang']) === 0) {
-    echo "<script>alert('Giỏ hàng trống! Vui lòng chọn sản phẩm.'); window.location.href='trangchu.php';</script>";
+// Kiểm tra có chọn sản phẩm không
+if (!isset($_POST['chon_sp']) || count($_POST['chon_sp']) === 0) {
+    echo "<script>alert('Bạn chưa chọn sản phẩm nào để đặt hàng!'); window.location.href='giohang.php';</script>";
     exit();
 }
 
-$giohang = $_SESSION['giohang'];
+$ds_sp_chon = $_POST['chon_sp']; // Mảng ID sản phẩm được chọn
+$giohang = [];
+
+if (isset($_SESSION['user_id'])) {
+    // Người dùng đã đăng nhập → lấy từ CSDL theo các sản phẩm được chọn
+    $user_id = $_SESSION['user_id'];
+    $ids = implode(',', array_map('intval', $ds_sp_chon)); // chuyển mảng ID thành chuỗi an toàn
+
+    $sql = "SELECT gh.san_pham_id, gh.so_luong AS soluong, sp.ten, sp.gia, sp.hinh_anh 
+            FROM gio_hang gh
+            JOIN san_pham sp ON gh.san_pham_id = sp.id
+            WHERE gh.user_id = $user_id AND gh.san_pham_id IN ($ids)";
+    $result = $conn->query($sql);
+
+    while ($row = $result->fetch_assoc()) {
+        $giohang[] = $row;
+    }
+
+    if (count($giohang) === 0) {
+        echo "<script>alert('Không tìm thấy sản phẩm đã chọn!'); window.location.href='giohang.php';</script>";
+        exit();
+    }
+} else {
+    // Nếu chưa đăng nhập → lọc từ session
+    foreach ($_SESSION['giohang'] as $sp) {
+    if (in_array($sp['id'] ?? $sp['san_pham_id'], $ds_sp_chon)) {
+        $giohang[] = $sp;
+    }
+}
+
+$_SESSION['giohang'] = $giohang;
+
+    if (count($giohang) === 0) {
+        echo "<script>alert('Không tìm thấy sản phẩm đã chọn trong giỏ hàng!'); window.location.href='giohang.php';</script>";
+        exit();
+    }
+}
 
 ?>
 
@@ -151,19 +188,25 @@ $giohang = $_SESSION['giohang'];
         </tbody>
     </table>
 
-    <form action="xulydathang.php" method="post">
-        <h2>Thông tin giao hàng</h2>
+   <form action="xulydathang.php" method="post">
+    <h2>Thông tin giao hàng</h2>
 
-        <label for="dia_chi">Địa chỉ giao hàng <span style="color:red">*</span></label>
-        <input type="text" name="dia_chi" id="dia_chi" required>
+    <label for="dia_chi">Địa chỉ giao hàng <span style="color:red">*</span></label>
+    <input type="text" name="dia_chi" id="dia_chi" required>
 
-        <label for="so_dien_thoai">Số điện thoại <span style="color:red">*</span></label>
-        <input type="text" name="so_dien_thoai" id="so_dien_thoai" required>
+    <label for="so_dien_thoai">Số điện thoại <span style="color:red">*</span></label>
+    <input type="text" name="so_dien_thoai" id="so_dien_thoai" required>
 
-        <label for="ghi_chu">Ghi chú đơn hàng</label>
-        <textarea name="ghi_chu" id="ghi_chu" rows="4" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
+    <label for="ghi_chu">Ghi chú đơn hàng</label>
+    <textarea name="ghi_chu" id="ghi_chu" rows="4" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
 
-        <button type="submit" class="dat-hang-btn btn-quay-lai">Xác nhận đặt hàng</button>
-    </form>
+    <!-- 🔥 Gửi lại danh sách sản phẩm đã chọn -->
+    <?php foreach ($ds_sp_chon as $id_sp): ?>
+        <input type="hidden" name="chon_sp[]" value="<?= htmlspecialchars($id_sp) ?>">
+    <?php endforeach; ?>
+
+    <button type="submit" class="dat-hang-btn btn-quay-lai">Xác nhận đặt hàng</button>
+</form>
+
 </body>
 </html>

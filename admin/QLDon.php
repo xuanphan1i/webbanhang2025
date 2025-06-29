@@ -83,9 +83,9 @@ $result = $conn->query($sql);
 <div class="h22"><h2>Danh sách đơn hàng</h2></div>
 <div class="baoa"><a href="index.php" class="btn-quay-lai">Quay lại</a></div>
 
-<table style="background-color: #91ad41; color: #ffff;">
+<table >
    <thead>
-    <tr>
+    <tr style=" color: #ffff;">
         <th>ID</th>
          <th>Tên khách hàng</th> <!-- 👈 thêm dòng này -->
         <th>Mã khách hàng</th>
@@ -136,15 +136,32 @@ if ($result->num_rows > 0) {
         echo "<td>" . htmlspecialchars($don['khach_hang_id']) . "</td>";
         echo "<td>" . htmlspecialchars($don['tong_tien']) . "</td>";
         echo "<td>" . htmlspecialchars($don['ngay_dat']) . "</td>";
-        echo "<td>" . htmlspecialchars($don['trang_thai']) . "</td>";
+        // echo "<td>" . htmlspecialchars($don['trang_thai']) . "</td>";
+        // Ánh xạ trạng thái sang tiếng Việt
+        $trang_thai_mapping = [
+            'cho_xac_nhan' => ['text' => 'Chờ xác nhận', 'color' => '#fff3cd'], // vàng nhạt
+            'dang_giao'    => ['text' => 'Đang giao',    'color' => '#d1ecf1'], // xanh dương nhạt
+            'da_giao'      => ['text' => 'Đã giao',      'color' => '#d4edda'], // xanh lá nhạt
+        ];
+
+        $tt = $don['trang_thai'];
+        $text = $trang_thai_mapping[$tt]['text'] ?? 'Không rõ';
+        $color = $trang_thai_mapping[$tt]['color'] ?? '#f8d7da'; // mặc định đỏ nhạt nếu không rõ
+
+        echo "<td style='background-color: $color; font-weight: bold; border-radius: 5px;'>$text</td>";
+
+
         echo "<td>" . htmlspecialchars($don['dia_chi']) . "</td>";
         echo "<td>" . htmlspecialchars($don['so_dien_thoai']) . "</td>";
         echo "<td>" . htmlspecialchars($don['ghi_chu']) . "</td>";
         echo "<td>" . implode(", ", $don['san_phams']) . "</td>"; // Sản phẩm gộp
         echo "<td>
-                <a href='QLDon.php?action=sua&id=" . $don['id'] . "'>Sửa</a> 
-                <a href='QLDon.php?action=xoa&id=" . $don['id'] . "' onclick=\"return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');\">Xóa</a>
-              </td>";
+    <div style='display: inline-flex; gap: 5px;'>
+        <a href='QLDon.php?action=sua&id=" . $don['id'] . "' class='btn-sua'>Sửa</a>
+        <a href='QLDon.php?action=xoa&id=" . $don['id'] . "' class='btn-xoa' onclick=\"return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');\">Xóa</a>
+    </div>
+</td>";
+
         echo "</tr>";
     }
 } else {
@@ -158,7 +175,8 @@ if ($result->num_rows > 0) {
 <?php if ($don_hang_sua): ?>
 <div class="overlay">
     <div class="form-sua">
-        <h3 style="color: #ffff;">Sửa đơn hàng ID: <?= htmlspecialchars($don_hang_sua['id']) ?></h3>
+        <h3 style="color: #ccc;
+            color: #222;  font-family: 'Segoe UI', 'Roboto', sans-serif; text-align: center;">Sửa đơn hàng ID: <?= htmlspecialchars($don_hang_sua['id']) ?></h3>
 
         <form method="POST" action="QLDon.php">
             <input type="hidden" name="id" value="<?= htmlspecialchars($don_hang_sua['id']) ?>">
@@ -181,15 +199,15 @@ if ($result->num_rows > 0) {
             <textarea name="ghi_chu" rows="3" style="width: 100%;"><?= htmlspecialchars($don_hang_sua['ghi_chu']) ?></textarea><br><br>
 
             <!-- Đây là nút GỬI FORM -->
-            <button type="submit" name="sua_don_hang">Sửa</button>
+            <button type="submit" name="sua_don_hang" class="btn-sua2">Sửa</button>
 
             <!-- Đây là nút QUAY LẠI -->
-            <a href="QLDon.php" style="margin-left: 10px; color: white; background-color: red; padding: 5px 10px; text-decoration: none;">Hủy</a>
+            <a href="QLDon.php" style="margin-left: 10px; color: white; background-color: red; padding: 5px 10px; text-decoration: none;" class="btn-huy2">Hủy</a>
         </form>
     </div>
 </div>
 <?php endif; ?>
-
+ 
 
 
 <div style="height: 500px;" class="cuoi"></div>
@@ -201,11 +219,17 @@ if ($result->num_rows > 0) {
     th { background: #2e7d32; }
     .form-sua {
         margin-top: 20px;
-        padding: 15px;
-        border: 1px solid #ccc;
-        background: #59cca6;
-        width: 400px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background:rgb(255, 255, 255);
+            width: 400px;
+            padding: 20px;
+            border: 2px solid khaki;           /* Viền xám nhạt */
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+
+
     .h22 {
         padding: 40px 0;
         background-image: url(../public/assets/img/main/gioiThieu/a1.png);
@@ -230,7 +254,27 @@ if ($result->num_rows > 0) {
         padding: 20px;
         color: #ef7f94;
     }
-    label { color: #ffff; }
+
+    label{
+            color: #ccc;
+            color: #222;              /* Đen nhẹ */
+            font-weight: 600;
+            font-size: 17px;          /* To rõ */
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        input{
+            width: 100%;
+            padding: 12px 16px;              /* to hơn, rộng rãi */
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
     button {
         padding: 10px 20px;
         background-color: #e3b375;
@@ -268,5 +312,65 @@ if ($result->num_rows > 0) {
         align-items: center;
         z-index: 999;
     }
+    /* Nút Sửa: nền trắng, viền đỏ, chữ đỏ */
+.btn-sua2 {
+    padding: 10px 20px;
+    background-color: white;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-sua2:hover {
+    background-color: #ffecec;
+    color: #b71c1c;
+}
+
+/* Nút Hủy: nền đỏ, chữ trắng, không viền */
+.btn-huy2 {
+    padding: 10px 20px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-huy2:hover {
+    background-color: #b71c1c;
+}
+
+.btn-sua {
+    background-color: #4CAF50; /* xanh lá */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-xoa {
+    background-color: #f44336; /* đỏ */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-sua:hover {
+    background-color: #45a049;
+}
+
+.btn-xoa:hover {
+    background-color: #d32f2f;
+}
 </style>
 </html>

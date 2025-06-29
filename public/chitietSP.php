@@ -2,6 +2,51 @@
 session_start();
 require_once '../config/config.php';
 
+// XỬ LÝ THÊM GIỎ HÀNG NGAY TRONG FILE NÀY
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['them_gio'])) {
+    $sp_id = (int)$_POST['id'];
+    $so_luong = (int)$_POST['soluong'];
+
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $stmt = $conn->prepare("SELECT * FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+        $stmt->bind_param("ii", $user_id, $sp_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $stmt = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
+            $stmt->bind_param("iii", $so_luong, $user_id, $sp_id);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
+            $stmt->bind_param("iii", $user_id, $sp_id, $so_luong);
+        }
+
+        $stmt->execute();
+        echo json_encode(['status' => 'success', 'message' => 'Đã thêm vào giỏ hàng (CSDL)']);
+        exit;
+    } else {
+        $sp = [
+            'san_pham_id' => $sp_id,
+            'ten' => $_POST['ten'],
+            'gia' => $_POST['gia'],
+            'hinh_anh' => $_POST['hinh_anh'],
+            'so_luong' => $so_luong
+        ];
+
+        if (!isset($_SESSION['giohang'])) $_SESSION['giohang'] = [];
+        if (isset($_SESSION['giohang'][$sp_id])) {
+            $_SESSION['giohang'][$sp_id]['so_luong'] += $so_luong;
+        } else {
+            $_SESSION['giohang'][$sp_id] = $sp;
+        }
+
+        echo json_encode(['status' => 'session', 'message' => 'Đã thêm vào giỏ hàng (chưa đăng nhập)']);
+        exit;
+    }
+}
+
+// LẤY DỮ LIỆU CHI TIẾT SẢN PHẨM
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     $sql = "SELECT * FROM san_pham WHERE id = $id";
@@ -24,19 +69,18 @@ if (isset($_GET['id'])) {
 <head>
     <meta charset="UTF-8">
     <title>Chi tiết sản phẩm - <?= htmlspecialchars($sp['ten']) ?></title>
-        <link rel="icon" type="image/png" href="../public/assets/img/favicon/android-chrome-512x512.png">
-
+    <link rel="icon" type="image/png" href="../public/assets/img/favicon/android-chrome-512x512.png">
 </head>
 <body>
-  <?php require '../includes/T11header.php'?>
-    <div id="khung">
-        <div class="h22"><h2>Chi tiết sản phẩm</h2></div>
-        <!-- Nút quay lại -->
-        <div class="baoa">
+<?php require '../includes/T11header.php'; ?>
+<div id="khung">
+    <div class="h22"><h2>Chi tiết sản phẩm</h2></div>
+    <div class="baoa">
         <a href="javascript:history.back()" class="btn-quay-lai">Quay lại</a>
-        </div>
-        <?php if ($sp): ?>
-        <div class="duoi">
+    </div>
+
+    <?php if ($sp): ?>
+    <div class="duoi">
         <div class="anh">
             <img src="<?= htmlspecialchars($sp['hinh_anh']) ?>" alt="<?= htmlspecialchars($sp['ten']) ?>" />
         </div>
@@ -48,30 +92,60 @@ if (isset($_GET['id'])) {
             <h4 class="dang-cap-nhat">(Thông tin sản phẩm đang được cập nhật)</h4>
             <p class="gia">Giá: $<?= number_format($sp['gia'], 2) ?></p>
             <div class="sl">
-            <label for="sl">Số lượng:</label>
-            <input type="number" name="sl" id="sl" value="1" min="1" max="10" />
+                <label for="sl">Số lượng:</label>
+                <input type="number" name="soluong" class="input-soluong" value="1" min="1" max="10" />
             </div>
-           
-            <form action="giohang.php" method="POST">
-               <!-- Truyền thêm thông tin sản phẩm (ẩn) -->
-            <input type="hidden" name="id" value="<?= $sp['id'] ?>">
-            <input type="hidden" name="ten" value="<?= htmlspecialchars($sp['ten']) ?>">
-            <input type="hidden" name="gia" value="<?= $sp['gia'] ?>">
-            <input type="hidden" name="hinh_anh" value="<?= htmlspecialchars($sp['hinh_anh']) ?>">
-            <input type="hidden" name="soluong" value="1">
 
-              <!-- Nút thêm vào giỏ -->
-              <button type="submit" name="them_gio" class="btn-them">Thêm vào giỏ hàng</button>
-          </form>
-
+            <form action="" method="POST" class="form-them-gio">
+                <input type="hidden" name="id" value="<?= $sp['id'] ?>">
+                <input type="hidden" name="ten" value="<?= htmlspecialchars($sp['ten']) ?>">
+                <input type="hidden" name="gia" value="<?= $sp['gia'] ?>">
+                <input type="hidden" name="hinh_anh" value="<?= htmlspecialchars($sp['hinh_anh']) ?>">
+                <input type="hidden" name="soluong" value="1">
+                <button type="submit" name="them_gio" class="btn-them">Thêm vào giỏ hàng</button>
+            </form>
         </div>
-        </div>
-        <?php else: ?>
-        <p>Không tìm thấy sản phẩm.</p>
-        <?php endif; ?>
-
     </div>
-    <?php require '../includes/footer.php' ?>
+    <?php else: ?>
+        <p>Không tìm thấy sản phẩm.</p>
+    <?php endif; ?>
+</div>
+<?php require '../includes/footer.php'; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.form-them-gio').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            formData.append('them_gio', '1');
+
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Lỗi kết nối hoặc phản hồi máy chủ không hợp lệ');
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success' || data.status === 'session') {
+                    alert('✅ ' + data.message);
+                } else {
+                    alert('❌ Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('⚠️ Không thể kết nối đến máy chủ!');
+                console.error('Lỗi:', error);
+            });
+        });
+    });
+});
+</script>
+
+
 </body>
 <style>
     .h22 {

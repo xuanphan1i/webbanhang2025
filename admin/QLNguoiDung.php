@@ -64,9 +64,9 @@ $result = $conn->query($sql);
         <!-- Nút quay lại -->
     <div class="baoa"><a href="index.php" class="btn-quay-lai">Quay lại</a></div>
 
-    <table style="background-color: #91ad41; color: #ffff;">
+    <table >
         <thead>
-            <tr>
+            <tr style="color: #ffff;">
                 <th>ID</th>
                 <th>Tên</th>
                 <th>Email</th>
@@ -88,8 +88,8 @@ $result = $conn->query($sql);
                     echo "<td>" . htmlspecialchars($row['vai_tro']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['ngay_tao']) . "</td>";
                     echo "<td>
-                            <a href='QLnguoidung.php?action=sua&id=" . $row['id'] . "'>Sửa</a> |
-                            <a href='QLnguoidung.php?action=xoa&id=" . $row['id'] . "' onclick=\"return confirm('Bạn có chắc chắn muốn xóa không?');\">Xóa</a>
+                            <a href='QLnguoidung.php?action=sua&id=" . $row['id'] . "' class='btn-sua' >Sửa</a> |
+                            <a href='QLnguoidung.php?action=xoa&id=" . $row['id'] . "'class='btn-xoa' onclick=\"return confirm('Bạn có chắc chắn muốn xóa không?');\">Xóa</a>
                           </td>";
                     echo "</tr>";
                 }
@@ -104,7 +104,7 @@ $result = $conn->query($sql);
     <?php if ($nguoi_dung_sua): ?>
     <div class="overlay">
         <div class="form-sua">
-        <h3 style="color: #ffff;" >Sửa người dùng: <?= htmlspecialchars($nguoi_dung_sua['ten']) ?></h3>
+        <h3 style="font-size: 20px; color:#aaa ; font-weight: 600; text-align: center;" >Sửa người dùng: <?= htmlspecialchars($nguoi_dung_sua['ten']) ?></h3>
         <form method="POST">
             <input type="hidden" name="id" value="<?= $nguoi_dung_sua['id'] ?>">
             <label>Tên:</label><br>
@@ -116,9 +116,9 @@ $result = $conn->query($sql);
             <label>Số điện thoại:</label><br>
             <input type="text" name="so_dien_thoai" pattern="[0-9]{10}" maxlength="10" value="<?= htmlspecialchars($nguoi_dung_sua['so_dien_thoai']) ?>" required><br><br>
 
-            <button type="submit" name="sua_nguoi_dung">Sửa</button>
+            <button type="submit" name="sua_nguoi_dung" class="btn-sua2">Sửa</button>
             <a href="QLNguoiDung.php" style="margin-left: 10px;">
-                <button type="button">Hủy</button>
+                <button type="button" class="btn-huy2">Hủy</button>
             </a>
 
         </form>
@@ -145,10 +145,14 @@ $result = $conn->query($sql);
             margin-top: 20px;
             padding: 15px;
             border: 1px solid #ccc;
-            background: #59cca6;
+            background:rgb(255, 255, 255);
             width: 400px;
-            
+            padding: 20px;
+            border: 2px solid khaki;           /* Viền xám nhạt */
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);  /* Đổ bóng nhẹ */
         }
+        
         .h22 {
             
             padding: 40px 0;
@@ -177,8 +181,26 @@ $result = $conn->query($sql);
             color: #ef7f94 ;
 
         }
+        h3,
         label{
-            color: #ffff
+            color: #ccc;
+            color: #222;              /* Đen nhẹ */
+            font-weight: 600;
+            font-size: 17px;          /* To rõ */
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        input{
+            width: 100%;
+            padding: 12px 16px;              /* to hơn, rộng rãi */
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
         }
         button{
             padding: 10px 20px;
@@ -227,7 +249,66 @@ $result = $conn->query($sql);
             align-items: center;
             z-index: 999;
             }
+/* Nút Sửa: nền trắng, viền đỏ, chữ đỏ */
+.btn-sua2 {
+    padding: 10px 20px;
+    background-color: white;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
+.btn-sua2:hover {
+    background-color: #ffecec;
+    color: #b71c1c;
+}
+
+/* Nút Hủy: nền đỏ, chữ trắng, không viền */
+.btn-huy2 {
+    padding: 10px 20px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-huy2:hover {
+    background-color: #b71c1c;
+}
+
+.btn-sua {
+    background-color: #4CAF50; /* xanh lá */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-xoa {
+    background-color: #f44336; /* đỏ */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-sua:hover {
+    background-color: #45a049;
+}
+
+.btn-xoa:hover {
+    background-color: #d32f2f;
+}
 
     </style>
 </html>

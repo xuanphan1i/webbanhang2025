@@ -62,8 +62,8 @@ if (isset($_POST['them'])) {
                 <option value="traicay">Trái Cây</option>
             </select><br><br>
 
-            <button type="submit" name="them">Thêm sản phẩm</button>
-            <a href="../QLSP.php"><button type="button">Hủy</button></a>
+            <button type="submit" name="them" class="btn-sua2">Thêm sản phẩm</button>
+            <a href="../QLSP.php"><button type="button" class="btn-huy2">Hủy</button></a>
 
         </form>
         </div>
@@ -74,7 +74,7 @@ if (isset($_POST['them'])) {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-     background-color: #d4e1b3; 
+     /* background-color: #d4e1b3;  */
 
 
 }
@@ -94,7 +94,7 @@ if (isset($_POST['them'])) {
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .baoa{
-     background-color: #d4e1b3; 
+     
 
 }
 h2 {
@@ -129,12 +129,14 @@ h2 {
         }
 
 form {
-    background-color: #ffffff;
+    background-color: #fff8e6;
     padding: 30px 40px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     width: 100%;
     max-width: 500px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* đổ bóng nhẹ */
+    font-family: 'Segoe UI', sans-serif;
 }
 
 button{
@@ -166,7 +168,59 @@ select {
     box-sizing: border-box;
     font-size: 16px;
 }
+.btn-sua2 {
+    padding: 10px 20px;
+    background-color: white;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
+.btn-sua2:hover {
+    background-color: #ffecec;
+    color: #b71c1c;
+}
+
+/* Nút Hủy: nền đỏ, chữ trắng, không viền */
+.btn-huy2 {
+    padding: 10px 20px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-huy2:hover {
+    background-color: #b71c1c;
+}
+label{
+            color: #ccc;
+            color: #222;              /* Đen nhẹ */
+            font-weight: 600;
+            font-size: 17px;          /* To rõ */
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        input{
+            width: 100%;
+            padding: 12px 16px;              /* to hơn, rộng rãi */
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
 </style>
 </html>
 

@@ -19,7 +19,20 @@ $sp = mysqli_fetch_assoc($result);
 if (isset($_POST['capnhat'])) {
     $ten = mysqli_real_escape_string($conn, $_POST['ten']);
     $gia = intval($_POST['gia']);
-    $hinh_anh = mysqli_real_escape_string($conn, $_POST['hinh_anh']);
+    // 
+    // Giữ ảnh cũ nếu không upload ảnh mới
+$hinh_anh = $_POST['hinh_anh_cu'];
+
+if (isset($_FILES['hinh_anh']) && $_FILES['hinh_anh']['error'] === 0) {
+    $upload_dir = '../../public/assets/img/';
+    $file_name = basename($_FILES['hinh_anh']['name']);
+    $tmp_path = $_FILES['hinh_anh']['tmp_name'];
+
+    if (move_uploaded_file($tmp_path, $upload_dir . $file_name)) {
+        $hinh_anh = '../public/assets/img/' . $file_name; // đường dẫn lưu trong DB
+    }
+}
+
     $mo_ta = mysqli_real_escape_string($conn, $_POST['mo_ta']);
     $danhmuc = mysqli_real_escape_string($conn, $_POST['danhmuc']);
 
@@ -52,16 +65,20 @@ if (isset($_POST['capnhat'])) {
     <div class="baoa"><a href="../../admin/QLSP.php" class="btn-quay-lai">Quay lại</a></div>
 
     <?php if ($sp): ?>
-        <div class="container">
-             <form method="POST">
+        <div class="container" style="background-color:rgba(255, 255, 255, 0.5);">
+             <form method="POST" enctype="multipart/form-data">
                 <label>Tên sản phẩm:</label><br>
                 <input type="text" name="ten" value="<?= htmlspecialchars($sp['ten']) ?>" required><br><br>
 
                 <label>Giá:</label><br>
                 <input type="number" name="gia" value="<?= $sp['gia'] ?>" required><br><br>
 
-                <label>Hình ảnh (đường dẫn):</label><br>
-                <input type="text" name="hinh_anh" value="<?= htmlspecialchars($sp['hinh_anh']) ?>" required><br><br>
+                <label>Hình ảnh mới:</label><br>
+<input type="file" name="hinh_anh" id="hinh_anh_input"><br><br>
+
+<!-- Ảnh xem trước -->
+<img id="preview_image" src="/webbanhang/public/<?= $sp['hinh_anh'] ?>" width="100">
+
 
                 <label>Mô tả:</label><br>
                 <textarea name="mo_ta" rows="4"><?= htmlspecialchars($sp['mo_ta']) ?></textarea><br><br>
@@ -74,13 +91,24 @@ if (isset($_POST['capnhat'])) {
                     <option value="traicay" <?= $sp['danhmuc'] == 'traicay' ? 'selected' : '' ?>>Trái Cây</option>
                 </select><br><br>
 
-                <button type="submit" name="capnhat">Sửa</button>
-                <a href="../QLSP.php"><button type="button">Hủy</button></a>
+                <button type="submit" name="capnhat" class="btn-sua2">Sửa</button>
+                <a href="../QLSP.php"><button type="button" class="btn-huy2" >Hủy</button></a>
             </form>
         </div>
     <?php else: ?>
         <p>Sản phẩm không tồn tại.</p>
     <?php endif; ?>
+    <!-- hiện ảnh ngay sau khi chọn -->
+    <script>
+document.getElementById('hinh_anh_input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const preview = document.getElementById('preview_image');
+        preview.src = URL.createObjectURL(file);
+    }
+});
+</script>
+
 </body>
 <style>
     .container {
@@ -88,7 +116,7 @@ if (isset($_POST['capnhat'])) {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-     background-color: #d4e1b3; 
+     
 
 
 }
@@ -108,8 +136,7 @@ if (isset($_POST['capnhat'])) {
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .baoa{
-     background-color: #d4e1b3; 
-
+     background-color: rgba(255, 255, 255, 0.5);
 }
 h2 {
     width: 500px;
@@ -143,12 +170,14 @@ h2 {
         }
 
 form {
-    background-color: #ffffff;
+   background-color: #fff8e6;
     padding: 30px 40px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     width: 100%;
     max-width: 500px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* đổ bóng nhẹ */
+    font-family: 'Segoe UI', sans-serif;
 }
 
 button{
@@ -180,6 +209,59 @@ select {
     box-sizing: border-box;
     font-size: 16px;
 }
+/* Nút Sửa: nền trắng, viền đỏ, chữ đỏ */
+.btn-sua2 {
+    padding: 10px 20px;
+    background-color: white;
+    color: #d32f2f;
+    border: 2px solid #d32f2f;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
+.btn-sua2:hover {
+    background-color: #ffecec;
+    color: #b71c1c;
+}
+
+/* Nút Hủy: nền đỏ, chữ trắng, không viền */
+.btn-huy2 {
+    padding: 10px 20px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-huy2:hover {
+    background-color: #b71c1c;
+}
+label{
+            color: #ccc;
+            color: #222;              /* Đen nhẹ */
+            font-weight: 600;
+            font-size: 17px;          /* To rõ */
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        input{
+            width: 100%;
+            padding: 12px 16px;              /* to hơn, rộng rãi */
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
 </style>
 </html>

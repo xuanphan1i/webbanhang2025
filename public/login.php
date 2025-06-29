@@ -1,100 +1,84 @@
 <!-- code php -->
 <?php
-session_start(); // ✅ Bắt buộc để sử dụng $_SESSION
-
-include '../config/config.php';  // 🟡 Đảm bảo đường dẫn đúng với vị trí file này
+session_start();
+include '../config/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $mat_khau = $_POST['password'];
-    $so_dien_thoai = $_POST['so_dien_thoai']; // ✅ Thêm dòng này để nhận số điện thoại
-    $vai_tro = $_POST['vai_tro']; // giá trị vai trò người dùng nhập
-
-    // 🔴 Đảm bảo form HTML của bạn có input name="email" và name="mat_khau"
+    $so_dien_thoai = $_POST['so_dien_thoai'];
 
     $sql = "SELECT * FROM nguoi_dung WHERE email = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('s', $email); // ✅ Gán email vào câu lệnh
-
+    $stmt->bind_param('s', $email);
     $stmt->execute();
-    $result = $stmt->get_result(); // ✅ Lấy kết quả sau khi thực hiện truy vấn
+    $result = $stmt->get_result();
 
-    //kiểm tra email , sdt, mk, vai trò có tồn tại ko, , 
-    if ($result->num_rows == 1) {// if này kiểm tra email có tồn tại ko, kiểm tra xem trong cơ sở dữ liệu có đúng 1 bản ghi với email đã nhập hay không 
-    $user = $result->fetch_assoc();
+    if ($result->num_rows == 1) {
+        $user = $result->fetch_assoc();
 
-    // So sánh số điện thoại
-    if ($so_dien_thoai != $user['so_dien_thoai']) {
-        echo "<script> alert('Vui lòng nhập lại! (Số điện thoại không đúng!)')</script> " ;//alert('Đăng nhập thất bại, vui lòng thử lại!');
-    }
-    // So sánh mật khẩu
-    else if ($user['vai_tro'] != $vai_tro) {
-        echo " <script> alert ('Vui lòng nhập lại! (Bạn không có quyền truy cập trang quản trị!)')</script> ";
-    }
-    // So sánh vai trò
-    else if ($mat_khau != $user['mat_khau']) {
-        echo " <script>alert('Vui lòng nhập lại! (Mật khẩu không đúng!)')</script> ";
-    }
-    // Nếu tất cả đều đúng
-    else {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_name'] = $user['ten'];
-        $_SESSION['user_role'] = $user['vai_tro'];
-        // ✅ Thêm đoạn này để giữ giỏ hàng sau khi đăng nhập nếu trước đó đã thêm và lưu giỏ đó vào database 
-        if (isset($_SESSION['giohang']) && !empty($_SESSION['giohang'])) {
-            foreach ($_SESSION['giohang'] as $sp) {
-                $id_sp = $sp['id']; // ✅ Lấy đúng id sản phẩm
-               $so_luong = isset($sp['soluong']) ? (int)$sp['soluong'] : 1; // Gán mặc định là 1 nếu không có
+        if ($so_dien_thoai != $user['so_dien_thoai']) {
+            echo "<script>alert('Vui lòng nhập lại! (Số điện thoại không đúng!)')</script>";
+        } elseif ($mat_khau != $user['mat_khau']) {
+            echo "<script>alert('Vui lòng nhập lại! (Mật khẩu không đúng!)')</script>";
+        } else {
+            // Đăng nhập thành công
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['ten'];
+            $_SESSION['user_role'] = $user['vai_tro'];
 
+            // Nếu có giỏ hàng trong session thì lưu lại vào DB
+            if (isset($_SESSION['giohang']) && !empty($_SESSION['giohang'])) {
+                foreach ($_SESSION['giohang'] as $id_sp => $sp) {
+                    $so_luong = isset($sp['so_luong']) ? (int)$sp['so_luong'] : 1;
 
-                // Kiểm tra đã có trong DB chưa
-                $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
-                $stmt->bind_param("ii", $_SESSION['user_id'], $id_sp);
-                $stmt->execute();
-                $result = $stmt->get_result();
+                    $stmt_check_sp = $conn->prepare("SELECT id FROM san_pham WHERE id = ?");
+                    $stmt_check_sp->bind_param("i", $id_sp);
+                    $stmt_check_sp->execute();
+                    $result_check_sp = $stmt_check_sp->get_result();
 
-                if ($result->num_rows > 0) {
-                    // Cập nhật số lượng
-                    $stmt_update = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
-                    $stmt_update->bind_param("iii", $so_luong, $_SESSION['user_id'], $id_sp);
-                    $stmt_update->execute();
-                    $stmt_update->close();
-                } else {
-                    // Thêm mới
-                    $stmt_insert = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
-                    $stmt_insert->bind_param("iii", $_SESSION['user_id'], $id_sp, $so_luong);
-                    $stmt_insert->execute();
-                    $stmt_insert->close();
+                    if ($result_check_sp->num_rows > 0) {
+                        $stmt = $conn->prepare("SELECT id FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+                        $stmt->bind_param("ii", $_SESSION['user_id'], $id_sp);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows > 0) {
+                            $stmt_update = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
+                            $stmt_update->bind_param("iii", $so_luong, $_SESSION['user_id'], $id_sp);
+                            $stmt_update->execute();
+                            $stmt_update->close();
+                        } else {
+                            $stmt_insert = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
+                            $stmt_insert->bind_param("iii", $_SESSION['user_id'], $id_sp, $so_luong);
+                            $stmt_insert->execute();
+                            $stmt_insert->close();
+                        }
+
+                        $stmt->close();
+                    }
+
+                    $stmt_check_sp->close();
                 }
 
-                $stmt->close();
+                unset($_SESSION['giohang']); // Xoá session giỏ sau khi lưu
             }
 
-            // ✅ Xoá session giỏ hàng sau khi chuyển
-            unset($_SESSION['giohang']);
-        }
-
-
-        
-        // đủ đk đăng nhập
-        echo "<script>alert('Đăng nhập thành công!');";
+            // Chuyển trang sau khi đăng nhập
+            echo "<script>alert('Đăng nhập thành công!');";
             if ($user['vai_tro'] == 'admin') {
                 echo "window.location.href = '../admin/index.php';";
-            } else if ($user['vai_tro'] == 'nguoidung') {
+            } else {
                 echo "window.location.href = '../public/index.php';";
-            } 
-
+            }
             echo "</script>";
-
-        // header('Location: ../admin/index.php');
+        }
+    } else {
+        echo "<script>alert('Vui lòng nhập lại! (Email không tồn tại!)')</script>";
     }
-} else {
-    echo " <script>alert('Vui lòng nhập lại! (Email không tồn tại!)')</script> ";
-}
-
-
 }
 ?>
+
 
 <!-- giao diện html+ css -->
 <!DOCTYPE html>
@@ -135,13 +119,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="password" id="password" name="password" required />
                 </div>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                   <label for="vai_tro">Vai trò</label>
                   <select id="vai_tro" name="vai_tro" required>
                     <option value="nguoidung">nguoidung</option>
                     <option value="admin">admin</option>
                   </select>
-                </div>
+                </div> -->
 
                 <button type="submit">Đăng Nhập</button>
 

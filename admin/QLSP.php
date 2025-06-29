@@ -33,7 +33,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
     $stmt->bind_param("i", $id);
     $stmt->execute();
     echo "<script>alert('Đã xóa sản phẩm!'); window.location.href='qlsp.php';</script>";
-    exit;
+    exit; 
 }
 ?>
 
@@ -54,7 +54,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
 
     <a class="btn-them" href="../admin/QLSP/ThemSP.php">+ Thêm sản phẩm mới</a>
 
-    <table style="background-color: #91ad41; color: #ffff;">
+    <table >
         <tr>
             <th>ID</th>
             <th>Tên</th>
@@ -74,9 +74,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
             <td><?= htmlspecialchars($row['mo_ta']) ?></td>
             <td><?= htmlspecialchars($row['danhmuc']) ?></td>
             <td>
-                <a class="btn btn-sua" href="/webbanhang/admin/QLSP/SuaSP.php?id=<?=$row['id']?>">Sửa</a>
+                <a class="btn btn-sua" href="/webbanhang/admin/QLSP/SuaSP.php?id=<?=$row['id']?>" class='btn-sua'>Sửa</a>
 
-                <a class="btn btn-xoa" href="QLSP.php?action=xoa&id=<?= $row['id'] ?>" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">Xóa</a>
+                <a class="btn btn-xoa" href="QLSP.php?action=xoa&id=<?= $row['id'] ?>" class='btn-xoa' onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">Xóa</a>
 
 
             </td>
@@ -199,5 +199,30 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
         .btn-xoa:hover {
             background-color: #c82333;
         }
+        .btn-sua {
+    background-color: #4CAF50; /* xanh lá */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-xoa {
+    background-color: #f44336; /* đỏ */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-sua:hover {
+    background-color: #45a049;
+}
+
+.btn-xoa:hover {
+    background-color: #d32f2f;
+}
     </style>
 </html>

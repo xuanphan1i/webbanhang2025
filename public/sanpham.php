@@ -12,6 +12,50 @@ if (!empty($danhmuc)) {
 }
 
 $result = mysqli_query($conn, $sql);
+
+// XỬ LÝ THÊM GIỎ HÀNG NGAY TRONG FILE NÀY
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['them_gio'])) {
+    $sp_id = (int)$_POST['id'];
+    $so_luong = (int)$_POST['soluong'];
+
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $stmt = $conn->prepare("SELECT * FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+        $stmt->bind_param("ii", $user_id, $sp_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $stmt = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
+            $stmt->bind_param("iii", $so_luong, $user_id, $sp_id);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
+            $stmt->bind_param("iii", $user_id, $sp_id, $so_luong);
+        }
+
+        $stmt->execute();
+        echo json_encode(['status' => 'success', 'message' => 'Đã thêm vào giỏ hàng (CSDL)']);
+        exit;
+    } else {
+        $sp = [
+            'san_pham_id' => $sp_id,
+            'ten' => $_POST['ten'],
+            'gia' => $_POST['gia'],
+            'hinh_anh' => $_POST['hinh_anh'],
+            'so_luong' => $so_luong
+        ];
+
+        if (!isset($_SESSION['giohang'])) $_SESSION['giohang'] = [];
+        if (isset($_SESSION['giohang'][$sp_id])) {
+            $_SESSION['giohang'][$sp_id]['so_luong'] += $so_luong;
+        } else {
+            $_SESSION['giohang'][$sp_id] = $sp;
+        }
+
+        echo json_encode(['status' => 'session', 'message' => 'Đã thêm vào giỏ hàng (chưa đăng nhập)']);
+        exit;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -64,7 +108,21 @@ $result = mysqli_query($conn, $sql);
                 </a>
                 <div class="sp_chu">
                     <div class="ten"><?= $row['ten'] ?></div>
-                    <div class="gia"><?= number_format($row['gia'], 0, ',', '.') ?> đ</div>
+                    <div class="gia-them">
+    <span class="gia"><?= number_format($row['gia'], 0, ',', '.') ?> đ</span>
+
+    <!-- Form thêm vào giỏ hàng -->
+   <form method="post" action="them_vao_gio.php" class="form-gio" onsubmit="themVaoGio(this); return false;">
+    <input type="hidden" name="id" value="<?= $row['id'] ?>">
+    <input type="hidden" name="ten" value="<?= $row['ten'] ?>">
+    <input type="hidden" name="gia" value="<?= $row['gia'] ?>">
+    <input type="hidden" name="hinh_anh" value="<?= $row['hinh_anh'] ?>">
+    <input type="hidden" name="soluong" value="1">
+    <button type="submit" name="them_gio" class="nut-them-gio" title="Thêm giỏ hàng">+</button>
+</form>
+
+</div>
+
                 </div>
             </div>
         <?php } ?>
@@ -76,6 +134,35 @@ $result = mysqli_query($conn, $sql);
     .li_sp a.active {
   background-color: #91ac41;
   color: #fff;
+}
+.gia-them {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gia {
+    font-weight: bold;
+    color: #ef7f94;
+}
+
+.form-gio {
+    margin-left: 10px;
+}
+
+.nut-them-gio {
+    background-color: #ef7f94;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+.nut-them-gio:hover {
+    background-color: #d95e7d;
 }
 
         .ul_sp {
