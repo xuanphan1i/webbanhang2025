@@ -214,6 +214,14 @@ if ($result->num_rows > 0) {
 </body>
 
 <style>
+    textarea {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+body{
+        font-family: Arial, Helvetica, sans-serif;
+
+    }
     table { border-collapse: collapse; width: 100%; margin-top: 10px; }
     th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
     th { background: #2e7d32; }

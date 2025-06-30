@@ -32,7 +32,18 @@ ul {
   object-fit: cover;
 }
 
-button {
+/* button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 20px;
+} */
+ .slider button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -43,6 +54,7 @@ button {
   cursor: pointer;
   font-size: 20px;
 }
+
 .prev {
   left: 10px;
 }

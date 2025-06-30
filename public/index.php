@@ -1,5 +1,51 @@
 <?php
 require_once('../config/config.php'); // điều chỉnh đường dẫn nếu cần
+session_start(); // Quan trọng để sử dụng session
+
+// ===== XỬ LÝ THÊM GIỎ HÀNG =====
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['them_gio'])) {
+    $sp_id = (int)$_POST['id'];
+    $so_luong = 1;
+
+    if (isset($_SESSION['user_id'])) {
+        // Người dùng đã đăng nhập -> lưu vào CSDL
+        $user_id = $_SESSION['user_id'];
+        $stmt = $conn->prepare("SELECT * FROM gio_hang WHERE user_id = ? AND san_pham_id = ?");
+        $stmt->bind_param("ii", $user_id, $sp_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $stmt = $conn->prepare("UPDATE gio_hang SET so_luong = so_luong + ? WHERE user_id = ? AND san_pham_id = ?");
+            $stmt->bind_param("iii", $so_luong, $user_id, $sp_id);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO gio_hang (user_id, san_pham_id, so_luong) VALUES (?, ?, ?)");
+            $stmt->bind_param("iii", $user_id, $sp_id, $so_luong);
+        }
+        $stmt->execute();
+        echo "<script>alert('Đã thêm vào giỏ hàng!'); window.location.href = window.location.href;</script>";
+        exit;
+    } else {
+        // Chưa đăng nhập -> lưu vào session
+        $sp = [
+            'san_pham_id' => $sp_id,
+            'ten' => $_POST['ten'],
+            'gia' => $_POST['gia'],
+            'hinh_anh' => $_POST['hinh_anh'],
+            'so_luong' => $so_luong
+        ];
+
+        if (!isset($_SESSION['giohang'])) $_SESSION['giohang'] = [];
+        if (isset($_SESSION['giohang'][$sp_id])) {
+            $_SESSION['giohang'][$sp_id]['so_luong'] += $so_luong;
+        } else {
+            $_SESSION['giohang'][$sp_id] = $sp;
+        }
+
+        echo "<script>alert('Đã thêm vào giỏ hàng!'); window.location.href = window.location.href;</script>";
+        exit;
+    }
+}
 
 
 $sql = "SELECT * FROM san_pham ORDER BY RAND() LIMIT 12";
@@ -63,11 +109,21 @@ $result = mysqli_query($conn, $sql);
                       <img src="<?= htmlspecialchars($sp['hinh_anh']) ?>" alt="<?= htmlspecialchars($sp['ten']) ?>">
                     </a>
                     <div class="sp_chu">
-                      <a href="chitietSP.php?id=<?= $sp['id'] ?></a>">
-                        <div class="ten"><?= htmlspecialchars($sp['ten']) ?></div>
-                        <div class="gia">$<?= number_format($sp['gia'], 2) ?></div>
-                      </a>
+                      <div class="ten"><?= htmlspecialchars($sp['ten']) ?></div>
+                      <div class="gia-them">
+                          <div class="gia"><?= number_format($sp['gia'], 0, ',', '.') ?> đ</div>
+
+                      <!-- Form thêm giỏ hàng -->
+                      <form method="post" style="display:inline;">
+                          <input type="hidden" name="id" value="<?= $sp['id'] ?>">
+                          <input type="hidden" name="ten" value="<?= $sp['ten'] ?>">
+                          <input type="hidden" name="gia" value="<?= $sp['gia'] ?>">
+                          <input type="hidden" name="hinh_anh" value="<?= $sp['hinh_anh'] ?>">
+                          <button type="submit" name="them_gio" class="nut-them-gio" title="Thêm vào giỏ hàng">+</button>
+                      </form>
                     </div>
+                  </div>
+
                   </div>
                 <?php endwhile; ?>
               </div>
@@ -155,9 +211,34 @@ $result = mysqli_query($conn, $sql);
     
      <style>
       /* phần giới thiệu  */
+      .gia-them form {
+    display: inline-block;
+}
+
 .gioi_thieu {
   text-align: center ;
 }
+.gia-them {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nut-them-gio {
+    background-color: #ef7f94;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+.nut-them-gio:hover {
+    background-color: #d95e7d;
+}
+
 .san_pham{
    text-align: center;
 }

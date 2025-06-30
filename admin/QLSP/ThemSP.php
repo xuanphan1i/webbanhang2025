@@ -24,6 +24,16 @@ if (isset($_POST['them'])) {
         echo "Lỗi thêm sản phẩm: " . mysqli_error($conn);
     }
 }
+//  lấy chọn tệp ảnh
+if (isset($_FILES['hinh_anh']) && $_FILES['hinh_anh']['error'] == 0) {
+    $ten_tap_tin = $_FILES['hinh_anh']['name'];
+    $duong_dan_tam = $_FILES['hinh_anh']['tmp_name'];
+
+    // Nơi lưu ảnh (nhớ tạo thư mục nếu chưa có)
+    $duong_dan_luu = '../../public/assets/img/main/sanpham/' . basename($ten_tap_tin);
+    move_uploaded_file($duong_dan_tam, $duong_dan_luu);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,15 +50,19 @@ if (isset($_POST['them'])) {
         <!-- Nút quay lại -->
     <div class="baoa"><a href="../../admin/QLSP.php" class="btn-quay-lai">Quay lại</a></div>
         <div class="container">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
             <label>Tên sản phẩm:</label><br>
             <input type="text" name="ten" required><br><br>
 
             <label>Giá:</label><br>
-            <input type="number" name="gia" required><br><br>
+            <input type="number" name="gia" min="1" required><br><br>
 
-            <label>Hình ảnh (đường dẫn):</label><br>
-            <input type="text" name="hinh_anh" value="../../public/assets/img/main/sanpham/" required><br><br>
+            <label>Chọn hình ảnh:</label><br>
+<input type="file" name="hinh_anh" accept="image/*" onchange="previewImage(event)" required><br><br>
+
+<!-- Ảnh hiển thị trước -->
+<img id="anh_xem_truoc" src="#" alt="Ảnh xem trước" style="max-width: 200px; display: none; border: 1px solid #ccc; padding: 5px;"><br><br>
+
 
             <label>Mô tả:</label><br>
             <textarea name="mo_ta" rows="4"></textarea><br><br>
@@ -67,8 +81,32 @@ if (isset($_POST['them'])) {
 
         </form>
         </div>
+
+    <script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('anh_xem_truoc');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    </script>
 </body>
 <style>
+    textarea {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+body{
+        font-family: Arial, Helvetica, sans-serif;
+
+    }
     .container {
     padding: 40px;
     display: flex;

@@ -200,7 +200,7 @@ div.nut1 {
 .nuttk {
     border: 1px solid #ccc;         /* Viền xám nhạt */
     outline: none;                  /* Xóa viền xanh khi focus */
-    border-radius: 4px;             /* Bo góc nhẹ nếu cần */
+    border-radius: 6px;             /* Bo góc nhẹ nếu cần */
     padding: 6px 10px;              /* Padding gọn gàng */
     font-size: 15px;
 }

@@ -71,13 +71,13 @@ if (isset($_FILES['hinh_anh']) && $_FILES['hinh_anh']['error'] === 0) {
                 <input type="text" name="ten" value="<?= htmlspecialchars($sp['ten']) ?>" required><br><br>
 
                 <label>Giá:</label><br>
-                <input type="number" name="gia" value="<?= $sp['gia'] ?>" required><br><br>
+                <input type="number" name="gia" value="<?= $sp['gia'] ?>" min="1"  required><br><br>
 
                 <label>Hình ảnh mới:</label><br>
-<input type="file" name="hinh_anh" id="hinh_anh_input"><br><br>
+                <input type="file" name="hinh_anh" id="hinh_anh_input"><br><br>
 
-<!-- Ảnh xem trước -->
-<img id="preview_image" src="/webbanhang/public/<?= $sp['hinh_anh'] ?>" width="100">
+                <!-- Ảnh xem trước -->
+                <img id="preview_image" src="/webbanhang/public/<?= $sp['hinh_anh'] ?>" width="100">
 
 
                 <label>Mô tả:</label><br>
@@ -111,6 +111,14 @@ document.getElementById('hinh_anh_input').addEventListener('change', function(e)
 
 </body>
 <style>
+    textarea {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+body{
+        font-family: Arial, Helvetica, sans-serif;
+
+    }
     .container {
     padding: 40px;
     display: flex;

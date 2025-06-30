@@ -128,6 +128,14 @@ $result = $conn->query($sql);
     <div style="height: 500px;" class="cuoi"></div>
 </body>
  <style>
+    textarea {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+body{
+        font-family: Arial, Helvetica, sans-serif;
+
+    }
         table {
             border-collapse: collapse;
             width: 100%;

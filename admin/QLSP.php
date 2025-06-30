@@ -1,6 +1,17 @@
 <?php
 session_start();
 require_once '../config/config.php';
+function hienThiDanhMucTiengViet($danhmuc) {
+    $mapping = [
+        'sinhto' => 'Sinh tố',
+        'rau' => 'Rau',
+        'thit' => 'Thịt',
+        'traicay' => 'Trái cây'
+    ];
+
+    return $mapping[$danhmuc] ?? ucfirst($danhmuc);
+}
+
 // Kiểm tra đăng nhập và quyền admin
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
     header("Location: ../public/login.php");
@@ -71,8 +82,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
             <td><?= htmlspecialchars($row['ten']) ?></td>
             <td><?= number_format($row['gia'], 0, ',', '.') ?> đ</td>
             <td><img src="<?= htmlspecialchars($row['hinh_anh']) ?>" alt=""></td>
-            <td><?= htmlspecialchars($row['mo_ta']) ?></td>
-            <td><?= htmlspecialchars($row['danhmuc']) ?></td>
+           <td >
+                <?= nl2br(htmlspecialchars($row['mo_ta'])) ?>
+           </td>
+
+
+            <td><?= hienThiDanhMucTiengViet($row['danhmuc']) ?></td>
+
             <td>
                 <a class="btn btn-sua" href="/webbanhang/admin/QLSP/SuaSP.php?id=<?=$row['id']?>" class='btn-sua'>Sửa</a>
 
@@ -92,7 +108,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
             background:rgb(255, 255, 255);
             padding: 20px;
         }
+        textarea {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+body{
+        font-family: Arial, Helvetica, sans-serif;
 
+    }
+/* Chỉ áp dụng cho ô chứa mô tả nếu có thể xác định */
+td:nth-child(5) {
+  text-align: left;
+  
+}
           .h22 {
             /* position: fixed; */
             top: 10px;
@@ -206,7 +234,15 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
     text-decoration: none;
     border-radius: 4px;
     font-size: 14px;
+    margin-bottom: 4px;
+   
 }
+td a.btn-sua,
+td a.btn-xoa {
+    display: inline-block !important;
+    margin-top: 0 !important;
+}
+
 
 .btn-xoa {
     background-color: #f44336; /* đỏ */

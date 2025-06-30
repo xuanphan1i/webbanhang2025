@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once('../config/config.php');
 
 // Lấy danh mục từ URL nếu có
@@ -112,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['them_gio'])) {
     <span class="gia"><?= number_format($row['gia'], 0, ',', '.') ?> đ</span>
 
     <!-- Form thêm vào giỏ hàng -->
-   <form method="post" action="them_vao_gio.php" class="form-gio" onsubmit="themVaoGio(this); return false;">
+  <form method="post" action="" class="form-gio">
     <input type="hidden" name="id" value="<?= $row['id'] ?>">
     <input type="hidden" name="ten" value="<?= $row['ten'] ?>">
     <input type="hidden" name="gia" value="<?= $row['gia'] ?>">
@@ -129,6 +130,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['them_gio'])) {
     </div>
 
             <?php require '../includes/footer.php'?>
+    <!-- js -->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.form-gio').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            formData.append('them_gio', '1');
+
+            fetch('', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' || data.status === 'session') {
+                    alert('✅ ' + data.message);
+                } else {
+                    alert('❌ Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('⚠️ Không thể kết nối đến máy chủ!');
+                console.error(err);
+            });
+        });
+    });
+});
+</script>
+
 </body>
 <style>
     .li_sp a.active {
