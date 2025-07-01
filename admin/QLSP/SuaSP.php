@@ -159,23 +159,25 @@ h2 {
     color: #ef7f94 ;
 
 }
-.btn-quay-lai {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #e3b375;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: background-color 0.3s ease;
-            margin-left: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn-quay-lai:hover {
-            background-color: #ef7f94; /* đậm hơn khi hover */
-        }
+  .btn-quay-lai {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;           /* nền trắng */
+    color: #ff9800;                    /* chữ cam */
+    border: 2px solid #ff9800;         /* viền cam */
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    margin-top: 0px;
+}
+
+.btn-quay-lai:hover {
+    background-color: #ff9800;         /* khi hover: nền cam */
+    color: white;                      /* chữ trắng */
+}
 
 form {
    background-color: #fff8e6;

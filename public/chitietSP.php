@@ -176,23 +176,25 @@ document.addEventListener('DOMContentLoaded', function () {
             color: #ef7f94 ;
 
     }
-    .btn-quay-lai {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #e3b375;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: background-color 0.3s ease;
-            margin-left: 10px;
-            margin-top: 0px;
-    }
-        
-    .btn-quay-lai:hover {
-            background-color: #ef7f94; /* đậm hơn khi hover */
-        }
+      .btn-quay-lai {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;           /* nền trắng */
+    color: #ff9800;                    /* chữ cam */
+    border: 2px solid #ff9800;         /* viền cam */
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    margin-top: 0px;
+}
+
+.btn-quay-lai:hover {
+    background-color: #ff9800;         /* khi hover: nền cam */
+    color: white;                      /* chữ trắng */
+}
     .duoi {
         display: flex;
         margin: 30px auto;
@@ -256,21 +258,24 @@ document.addEventListener('DOMContentLoaded', function () {
   border-radius: 4px;
   border: 1px solid #ccc;
 }
-button{
-            padding: 10px 20px;
-            background-color: #e3b375;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-        }
-button:hover{
-            background-color: #ef7f94; /* đậm hơn khi hover */
+.btn-them {
+    display: inline-block;
+    padding: 12px 28px;
+    background-color: #ee4d2d; /* cam đậm kiểu Shopee */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
 
-        }
+.btn-them:hover {
+    background-color: #d8431f; /* đậm hơn khi hover */
+}
+
 </style>
 </html>

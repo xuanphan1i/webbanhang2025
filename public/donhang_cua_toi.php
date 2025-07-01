@@ -41,12 +41,24 @@ echo '<thead>
         </tr>
       </thead>';
 echo '<tbody>';
+$trang_thai_mau = [
+    'cho_xac_nhan' => ['text' => 'Chờ xác nhận', 'color' => '#fff3cd'], // vàng nhạt
+    'dang_giao'    => ['text' => 'Đang giao',    'color' => '#bee5eb'], // xanh dương nhạt
+    'da_giao'      => ['text' => 'Đã giao',      'color' => '#c3e6cb'], // xanh lá nhạt
+    'da_huy'       => ['text' => 'Đã hủy',       'color' => '#f8d7da'], // đỏ nhạt (thêm nếu có)
+];
+
 while ($row = $result->fetch_assoc()) {
     echo '<tr>';
     echo '<td>#' . $row['id'] . '</td>';
     echo '<td>' . $row['ngay_dat'] . '</td>';
     echo '<td>' . number_format($row['tong_tien'], 0, ',', '.') . ' đ</td>';
-    echo '<td>' . htmlspecialchars($row['trang_thai']) . '</td>';
+    $trang_thai = $row['trang_thai'];
+$text = isset($trang_thai_mau[$trang_thai]) ? $trang_thai_mau[$trang_thai]['text'] : ucfirst($trang_thai);
+$color = isset($trang_thai_mau[$trang_thai]) ? $trang_thai_mau[$trang_thai]['color'] : '#f0f0f0';
+
+echo '<td style="background-color: ' . $color . '; font-weight: bold;">' . htmlspecialchars($text) . '</td>';
+
     echo '<td>' . htmlspecialchars($row['dia_chi']) . '</td>';
     echo '<td>' . htmlspecialchars($row['so_dien_thoai']) . '</td>';
     echo '<td>' . (!empty($row['ghi_chu']) ? htmlspecialchars($row['ghi_chu']) : '-') . '</td>';
@@ -97,23 +109,25 @@ echo '</table>';
             color: #ef7f94 ;
 
     }
-    .btn-quay-lai {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #e3b375;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: background-color 0.3s ease;
-            margin-left: 10px;
-            margin-top: 0px;
-    }
-        
-    .btn-quay-lai:hover {
-            background-color: #ef7f94; /* đậm hơn khi hover */
-        }
+     .btn-quay-lai {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;           /* nền trắng */
+    color: #ff9800;                    /* chữ cam */
+    border: 2px solid #ff9800;         /* viền cam */
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    margin-top: 0px;
+}
+
+.btn-quay-lai:hover {
+    background-color: #ff9800;         /* khi hover: nền cam */
+    color: white;                      /* chữ trắng */
+}
         .danh-sach-don {
     padding: 20px;
     display: flex;
@@ -145,9 +159,11 @@ echo '</table>';
 
 .bang-don th, .bang-don td {
     padding: 12px 16px;
-    border: 1px solid #ef7f94;
+    border: 1px solid #ccc; /* xám nhạt để phân biệt */
+    
     text-align: left;
 }
+
 
 .bang-don thead {
     background-color: #ef7f94;

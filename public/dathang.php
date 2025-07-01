@@ -94,23 +94,25 @@ $_SESSION['giohang'] = $giohang;
             color: #ef7f94 ;
 
     }
-    .btn-quay-lai {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #e3b375;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: background-color 0.3s ease;
-            margin-left: 10px;
-            margin-top: 0px;
-    }
-        
-    .btn-quay-lai:hover {
-            background-color: #ef7f94; /* đậm hơn khi hover */
-        }
+     .btn-quay-lai {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;           /* nền trắng */
+    color: #ff9800;                    /* chữ cam */
+    border: 2px solid #ff9800;         /* viền cam */
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    margin-top: 0px;
+}
+
+.btn-quay-lai:hover {
+    background-color: #ff9800;         /* khi hover: nền cam */
+    color: white;                      /* chữ trắng */
+}
         table {
             width: 90%;
             margin: auto;
@@ -138,12 +140,28 @@ $_SESSION['giohang'] = $giohang;
             margin-top: 5px;
             box-sizing: border-box;
         }
-        .dat-hang-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
+        .btn-xacnhan {
+    display: inline-block;
+    padding: 12px 28px;
+    background-color: #ee4d2d;      /* cam đậm Shopee */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+     /* căn giữa nút */
+    margin: 20px auto;
+    display: block;
+}
+
+/* Hover */
+.btn-xacnhan:hover {
+    background-color: #d8431f;      /* cam đậm hơn */
+}
+
     </style>
 </head>
 <body>
@@ -195,7 +213,11 @@ $_SESSION['giohang'] = $giohang;
     <input type="text" name="dia_chi" id="dia_chi" required>
 
     <label for="so_dien_thoai">Số điện thoại <span style="color:red">*</span></label>
-    <input type="text" name="so_dien_thoai" id="so_dien_thoai" required>
+    <input type="text" name="so_dien_thoai" id="so_dien_thoai"
+        required
+        pattern="^0\d{9}$"
+        title="Số điện thoại phải bắt đầu bằng số 0 và đủ 10 chữ số"
+        maxlength="10">
 
     <label for="ghi_chu">Ghi chú đơn hàng</label>
     <textarea name="ghi_chu" id="ghi_chu" rows="4" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."></textarea>
@@ -205,7 +227,8 @@ $_SESSION['giohang'] = $giohang;
         <input type="hidden" name="chon_sp[]" value="<?= htmlspecialchars($id_sp) ?>">
     <?php endforeach; ?>
 
-    <button type="submit" class="dat-hang-btn btn-quay-lai">Xác nhận đặt hàng</button>
+    <button type="submit" class="btn-xacnhan">Xác nhận đặt hàng</button>
+
 </form>
 
 </body>

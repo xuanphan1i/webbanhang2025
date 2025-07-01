@@ -158,18 +158,27 @@ if (isset($_SESSION['user_id'])) {
                     $tong += $tien;
 
                     echo '<tr>
-    <td><input type="checkbox" name="chon_sp[]" value="' . htmlspecialchars($sp['san_pham_id']) . '"></td>
-    <td>' . ($index + 1) . '</td>
-    <td><img src="' . htmlspecialchars($sp['hinh_anh']) . '" width="50"></td>
-    <td>' . htmlspecialchars($sp['ten']) . '</td>
-    <td>' . number_format($sp['gia']) . '</td>
-    <td><input type="number" id="soluong_' . $sp['san_pham_id'] . '" value="' . $sp['so_luong'] . '" min="1"></td>
-    <td>' . number_format($tien) . '</td>
-    <td>
-        <a href="giohang.php?xoa=' . $sp['san_pham_id'] . '">Xóa</a><br>
-        <a href="#" onclick="capNhatSoLuong(' . $sp['san_pham_id'] . ')">Cập nhật</a>
-    </td>
-</tr>';
+                        <td><input type="checkbox" name="chon_sp[]" value="' . htmlspecialchars($sp['san_pham_id']) . '"></td>
+                        <td>' . ($index + 1) . '</td>
+                        <td><img src="' . htmlspecialchars($sp['hinh_anh']) . '" width="50"></td>
+                        <td>' . htmlspecialchars($sp['ten']) . '</td>
+                        <td>' . number_format($sp['gia']) . '</td>
+                        <td><input type="number" id="soluong_' . $sp['san_pham_id'] . '" value="' . $sp['so_luong'] . '" min="1"></td>
+                        <td>' . number_format($tien) . '</td>
+                        <td>
+                            <a href="giohang.php?xoa=' . $sp['san_pham_id'] . '" 
+                            class="btn-xoa" 
+                            onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này không?\')">
+                            Xóa
+                            </a><br>
+                            <a href="#" 
+                            class="btn-capnhat" 
+                            onclick="capNhatSoLuong(' . $sp['san_pham_id'] . ')">
+                            Cập nhật
+                            </a>
+                        </td>
+                    </tr>';
+
 
                 }
             } else {
@@ -299,46 +308,47 @@ function copyCheckboxes() {
             color: #ef7f94 ;
 
     }
-   button[type="submit"],
-button[type="button"] {
+#nutDatHang {
     display: inline-block;
-    padding: 10px 20px;
-    background-color: #e3b375;
+    padding: 12px 28px;
+    background-color: #ee4d2d;      /* màu cam đỏ đặc trưng Shopee */
     color: white;
-    text-decoration: none;
+    border: none;
     border-radius: 6px;
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     transition: background-color 0.3s ease;
-    margin-left: 10px;
-    margin-top: 0px;
-    border: none;
     cursor: pointer;
 }
 
-/* Hover tách riêng ra */
-button[type="submit"]:hover,
-button[type="button"]:hover {
-    background-color: #ef7f94; /* đậm hơn khi hover */
+/* Hover */
+#nutDatHang:hover {
+    background-color: #d8431f;      /* cam đậm hơn */
 }
 
-    .btn-quay-lai {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #e3b375;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: background-color 0.3s ease;
-            margin-left: 10px;
-            margin-top: 0px;
-    }
-        
-    .btn-quay-lai:hover {
-            background-color: #ef7f94; /* đậm hơn khi hover */
-        }
+
+
+   .btn-quay-lai {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;           /* nền trắng */
+    color: #ff9800;                    /* chữ cam */
+    border: 2px solid #ff9800;         /* viền cam */
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    margin-top: 0px;
+}
+
+.btn-quay-lai:hover {
+    background-color: #ff9800;         /* khi hover: nền cam */
+    color: white;                      /* chữ trắng */
+}
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -390,6 +400,33 @@ button[type="button"]:hover {
     background-color: #aaa;
     cursor: not-allowed;
 }
+.thanh-cuoi-man-hinh {
+    display: flex;
+    justify-content: center; /* căn giữa theo chiều ngang */
+    align-items: center;
+    margin-top: 20px;
+}
 
+.btn-capnhat,
+.btn-xoa {
+    display: inline-block;
+    width: 90px;              /* ✅ Cố định chiều rộng */
+    text-align: center;
+    padding: 6px 10px;        /* ✅ Cùng padding */
+    font-size: 14px;          /* ✅ Cùng cỡ chữ */
+    border-radius: 4px;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 4px;
+}
+
+.btn-capnhat {
+    background-color: #4CAF50;  /* Xanh */
+}
+
+.btn-xoa {
+    background-color: #f44336;  /* Đỏ */
+             /* Khoảng cách giữa 2 nút */
+}
 
 </style>

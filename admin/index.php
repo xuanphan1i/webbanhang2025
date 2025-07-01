@@ -22,8 +22,9 @@
                 <div class="menu">
                     <ul class="ul1">
                         <li class="li1"><a href="../public/index.php">VỀ TRANG KHÁCH</a></li>
-                        <li class="li1"><a href="../admin/QLNguoiDung.php">QUẢN LÝ NGƯỜI DÙNG</a></li>
                         <li class="li1"><a href="../admin/QLSP.php">QUẢN LÝ SẢN PHẨM</a></li>
+                        <li class="li1"><a href="../admin/QLNguoiDung.php">QUẢN LÝ NGƯỜI DÙNG</a></li>
+                        
                         <li class="li1 limn"><a href="../admin/QLDon.php">QUẢN LÝ ĐƠN</a>                      
                         </li>
                     </ul>

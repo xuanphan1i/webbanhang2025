@@ -143,38 +143,56 @@ $result = mysqli_query($conn, $sql);
                   <img src="../public/assets/img/main/nengiamgia.jpg" alt="">
             </div>
         </div> 
-        <!-- giới thiệu  -->
-        <div class="gioi_thieu">
-         <div class="chu1">Về chúng tôi</div>
-         <div class="chu2">Chúng tôi là ai</div>
-         <div class="a-la"><img src="../public/assets/img/main/la2.png" alt=""></div>
-         <div class="chu3">Chúng tôi là những người mang đến thực phẩm sạch, an toàn và bền vững từ thiên nhiên.</div>
-         <ul class="ul_gt">
-            <li class="li_gt">
-               <img src="../public/assets/img/main/tron-1.png" alt="">
-               <div class="chudam">Trang trại tự nhiên</div>
-               <div class="gach"></div>
-               <div class="chu">Trang trại, tự nhiên, hữu cơ, bền vững, sạch, an toàn, sinh thái, tuần hoàn, phát triển, xanh.</div>
-            </li>
-            <li class="li_gt">
-               <img src="../public/assets/img/main/tron2.png" alt="">
-               <div class="chudam">Thực phẩm tốt cho sức khỏe</div>
-               <div class="gach"></div>
-               <div class="chu">Hữu cơ, tươi sạch, dinh dưỡng, an toàn, tự nhiên, ít chế biến, lành mạnh, cân bằng, giàu vitamin, bổ dưỡng.</div>
-            </li>
-            <li class="li_gt">
-               <img src="../public/assets/img/main/tron3.png" alt="">
-               <div class="chudam">Bảo tồn đa dạng sinh học</div>
-               <div class="gach"></div>
-               <div class="chu">Sinh thái, tự nhiên, bảo vệ, cân bằng, môi trường, hệ sinh thái, bền vững, phát triển, động thực vật, gen quý.</div>
-            </li>
-            <li class="li_gt">
-               <img src="../public/assets/img/main/tron4.png" alt=""></div>
-               <div class="gach"></div>
-               <div class="chu">Kiểm soát, phòng ngừa, bảo vệ, vi sinh, môi trường, dịch bệnh, an toàn, sinh thái, sức khỏe, bền vững.</div>
-            </li>
-         </ul>
-        </div>
+        <!-- giới thiệu -->
+<div class="gioi_thieu">
+  <div class="chu1">Về chúng tôi</div>
+  <div class="chu2">Chúng tôi là ai</div>
+  <div class="a-la">
+    <img src="../public/assets/img/main/la2.png" alt="">
+  </div>
+  <div class="chu3">
+    Chúng tôi là những người mang đến thực phẩm sạch, an toàn và bền vững từ thiên nhiên.
+  </div>
+  
+  <ul class="ul_gt">
+    <li class="li_gt">
+      <img src="../public/assets/img/main/tron-1.png" alt="">
+      <div class="chudam">Trang trại tự nhiên</div>
+      <div class="gach"></div>
+      <div class="chu">
+        Trang trại, tự nhiên, hữu cơ, bền vững, sạch, an toàn, sinh thái, tuần hoàn, phát triển, xanh.
+      </div>
+    </li>
+
+    <li class="li_gt">
+      <img src="../public/assets/img/main/tron2.png" alt="">
+      <div class="chudam">Thực phẩm tốt cho sức khỏe</div>
+      <div class="gach"></div>
+      <div class="chu">
+        Hữu cơ, tươi sạch, dinh dưỡng, an toàn, tự nhiên, ít chế biến, lành mạnh, cân bằng, giàu vitamin, bổ dưỡng.
+      </div>
+    </li>
+
+    <li class="li_gt">
+      <img src="../public/assets/img/main/tron3.png" alt="">
+      <div class="chudam">Bảo tồn đa dạng sinh học</div>
+      <div class="gach"></div>
+      <div class="chu">
+        Sinh thái, tự nhiên, bảo vệ, cân bằng, môi trường, hệ sinh thái, bền vững, phát triển, động thực vật, gen quý.
+      </div>
+    </li>
+
+    <li class="li_gt">
+      <img src="../public/assets/img/main/tron4.png" alt="">
+      <div class="chudam">Kiểm soát môi trường</div>
+      <div class="gach"></div>
+      <div class="chu">
+        Kiểm soát, phòng ngừa, bảo vệ, vi sinh, môi trường, dịch bệnh, an toàn, sinh thái, sức khỏe, bền vững.
+      </div>
+    </li>
+  </ul>
+</div>
+
         <!-- blog -->
         <div class="gioi_thieu">
             <div class="chu1">Bài viết nổi bật</div>
