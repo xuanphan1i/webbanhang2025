@@ -9,14 +9,37 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'admin') {
 }
 
 // Xử lý xóa
+// Xử lý xóa
 if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
     $id = intval($_GET['id']);
+
+    // Kiểm tra vai trò người dùng trước khi xóa
+    $stmt = $conn->prepare("SELECT vai_tro FROM nguoi_dung WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        echo "<script>alert('Người dùng không tồn tại!'); window.location.href='QLnguoidung.php';</script>";
+        exit;
+    }
+
+    $user = $result->fetch_assoc();
+
+    if ($user['vai_tro'] === 'admin') {
+        echo "<script>alert('Không thể xóa tài khoản có vai trò là admin!'); window.location.href='QLnguoidung.php';</script>";
+        exit;
+    }
+
+    // Nếu không phải admin thì xóa
     $stmt = $conn->prepare("DELETE FROM nguoi_dung WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
+
     echo "<script>alert('Đã xóa người dùng!'); window.location.href='QLnguoidung.php';</script>";
     exit;
 }
+
 // Khởi tạo biến tránh lỗi undefined
 $nguoi_dung_sua = null;
 
