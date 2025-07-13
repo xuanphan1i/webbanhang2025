@@ -53,23 +53,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sua_don_hang'])) {
 
 $sql = "
     SELECT 
-        dh.id AS don_hang_id,
-        nd.ten AS ten_khach_hang,
-        dh.khach_hang_id,
-        dh.tong_tien,
-        dh.ngay_dat,
-        dh.trang_thai,
-        dh.dia_chi,
-        dh.so_dien_thoai,
-        dh.ghi_chu,
-        ct.san_pham_id,
-        ct.so_luong,
-        ct.gia
-    FROM don_hang dh
-    JOIN chi_tiet_don_hang ct ON dh.id = ct.don_hang_id
-    JOIN nguoi_dung nd ON dh.khach_hang_id = nd.id
-    ORDER BY dh.id ASC
+    dh.id AS don_hang_id,
+    nd.ten AS ten_khach_hang,
+    dh.khach_hang_id,
+    dh.tong_tien,
+    dh.ngay_dat,
+    dh.trang_thai,
+    dh.dia_chi,
+    dh.so_dien_thoai,
+    dh.ghi_chu,
+    sp.ten AS ten_san_pham,
+    sp.id AS san_pham_id,
+    sp.gia AS gia_goc,
+    sp.hinh_anh, -- ✅ thêm dòng này
+    sp.mo_ta,
+    ct.so_luong,
+    ct.gia AS gia_mua
+FROM don_hang dh
+JOIN chi_tiet_don_hang ct ON dh.id = ct.don_hang_id
+JOIN san_pham sp ON ct.san_pham_id = sp.id
+JOIN nguoi_dung nd ON dh.khach_hang_id = nd.id
+ORDER BY dh.id ASC
+
 ";
+
 $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
@@ -83,23 +90,18 @@ $result = $conn->query($sql);
 <div class="h22"><h2>Danh sách đơn hàng</h2></div>
 <div class="baoa"><a href="index.php" class="btn-quay-lai">Quay lại</a></div>
 
-<table >
-   <thead>
-    <tr style=" color: #ffff;">
-        <th>ID</th>
-         <th>Tên khách hàng</th> <!-- 👈 thêm dòng này -->
-        <th>Mã khách hàng</th>
-        <th>Tổng tiền</th>
-        <th>Ngày đặt</th>
+<table>
+    <thead>
+    <tr style="color: #fff;">
+        <th>ID đơn</th>
+        <th>Tên khách hàng</th>
+        <th>ID khách hàng</th>
+        <th>Thông tin đơn</th> <!-- 👈 đã gộp -->
         <th>Trạng thái</th>
-        <th>Địa chỉ</th>
-        <th>Số điện thoại</th>
-        <th>Ghi chú</th>
-        <th>Sản phẩm</th> <!-- THÊM DÒNG NÀY -->
+        <th>Chi tiết đơn</th>
         <th>Thao tác</th>
     </tr>
 </thead>
-
 
     <tbody>
 <?php
@@ -112,56 +114,91 @@ if ($result->num_rows > 0) {
         if (!isset($don_hangs[$id])) {
             $don_hangs[$id] = [
                 'id' => $id,
-                'ten_khach_hang' => $row['ten_khach_hang'], // 👈 thêm dòng này
+                'ten_khach_hang' => $row['ten_khach_hang'],
                 'khach_hang_id' => $row['khach_hang_id'],
-                'tong_tien' => $row['tong_tien'],
                 'ngay_dat' => $row['ngay_dat'],
                 'trang_thai' => $row['trang_thai'],
                 'dia_chi' => $row['dia_chi'],
                 'so_dien_thoai' => $row['so_dien_thoai'],
                 'ghi_chu' => $row['ghi_chu'],
+                'tong_tien' => 0,
                 'san_phams' => []
             ];
         }
 
-        $don_hangs[$id]['san_phams'][] = "SP ID: " . $row['san_pham_id'] . " (sl:" . $row['so_luong'] . ")";
+        $thanh_tien = $row['gia_mua'] * $row['so_luong'];
+        $don_hangs[$id]['tong_tien'] += $thanh_tien;
 
+        $don_hangs[$id]['san_phams'][] = [
+            'ten' => $row['ten_san_pham'],
+            'hinh_anh' => $row['hinh_anh'],
+            'gia' => $row['gia_mua'],
+            'so_luong' => $row['so_luong'],
+            'thanh_tien' => $thanh_tien
+        ];
     }
 
     foreach ($don_hangs as $don) {
         echo "<tr>";
         echo "<td>" . htmlspecialchars($don['id']) . "</td>";
-        echo "<td>" . htmlspecialchars($don['ten_khach_hang']) . "</td>"; // 👈 sau dòng in ID
-
+        echo "<td>" . htmlspecialchars($don['ten_khach_hang']) . "</td>";
         echo "<td>" . htmlspecialchars($don['khach_hang_id']) . "</td>";
-        echo "<td>" . htmlspecialchars($don['tong_tien']) . "</td>";
-        echo "<td>" . htmlspecialchars($don['ngay_dat']) . "</td>";
-        // echo "<td>" . htmlspecialchars($don['trang_thai']) . "</td>";
-        // Ánh xạ trạng thái sang tiếng Việt
-        $trang_thai_mapping = [
-            'cho_xac_nhan' => ['text' => 'Chờ xác nhận', 'color' => '#fff3cd'], // vàng nhạt
-            'dang_giao'    => ['text' => 'Đang giao',    'color' => '#bee5eb'], // xanh dương nhạt
-            'da_giao'      => ['text' => 'Đã giao',      'color' => '#c3e6cb'], // xanh lá nhạt
-        ];
+        echo "<td>";
+        echo "<strong>Ngày đặt:</strong> " . htmlspecialchars($don['ngay_dat']) . "<br>";
+        echo "<strong>Địa chỉ:</strong> " . htmlspecialchars($don['dia_chi']) . "<br>";
+        echo "<strong>SĐT:</strong> " . htmlspecialchars($don['so_dien_thoai']) . "<br>";
+        echo "<strong>Ghi chú:</strong> " . htmlspecialchars($don['ghi_chu']);
+        echo "</td>";
 
+        $trang_thai_mapping = [
+            'cho_xac_nhan' => ['text' => 'Chờ xác nhận', 'color' => '#fff3cd'],
+            'dang_giao'    => ['text' => 'Đang giao',    'color' => '#bee5eb'],
+            'da_giao'      => ['text' => 'Đã giao',      'color' => '#c3e6cb'],
+        ];
         $tt = $don['trang_thai'];
         $text = $trang_thai_mapping[$tt]['text'] ?? 'Không rõ';
-        $color = $trang_thai_mapping[$tt]['color'] ?? '#f8d7da'; // mặc định đỏ nhạt nếu không rõ
-
+        $color = $trang_thai_mapping[$tt]['color'] ?? '#f8d7da';
         echo "<td style='background-color: $color; font-weight: bold; border-radius: 5px;'>$text</td>";
 
+        // Chi tiết đơn
+        echo "<td>";
+        echo "<table style='border-collapse: collapse; width: 100%; font-size: 13px;'>";
+        echo "<thead><tr>
+                <th>STT</th>
+                <th>Tên SP</th>
+                <th>Hình</th>
+                <th>Giá</th>
+                <th>SL</th>
+                <th>Thành tiền</th>
+              </tr></thead><tbody>";
 
-        echo "<td>" . htmlspecialchars($don['dia_chi']) . "</td>";
-        echo "<td>" . htmlspecialchars($don['so_dien_thoai']) . "</td>";
-        echo "<td>" . htmlspecialchars($don['ghi_chu']) . "</td>";
-        echo "<td>" . implode(", ", $don['san_phams']) . "</td>"; // Sản phẩm gộp
+        $stt = 1;
+        foreach ($don['san_phams'] as $sp) {
+            echo "<tr>";
+            echo "<td>$stt</td>";
+            echo "<td>" . htmlspecialchars($sp['ten']) . "</td>";
+            echo "<td><img src='" . htmlspecialchars($sp['hinh_anh']) . "' width='40'></td>";
+            echo "<td>" . number_format($sp['gia'], 0, ',', '.') . " đ</td>";
+            echo "<td>" . $sp['so_luong'] . "</td>";
+            echo "<td>" . number_format($sp['thanh_tien'], 0, ',', '.') . " đ</td>";
+            echo "</tr>";
+            $stt++;
+        }
+
+        echo "<tr>
+                <td colspan='5' style='text-align:right; font-weight:bold;'>Tổng cộng:</td>
+                <td><strong>" . number_format($don['tong_tien'], 0, ',', '.') . " đ</strong></td>
+              </tr>";
+
+        echo "</tbody></table>";
+        echo "</td>";
+
         echo "<td>
-    <div style='display: inline-flex; gap: 5px;'>
-        <a href='QLDon.php?action=sua&id=" . $don['id'] . "' class='btn-sua'>Sửa</a>
-        <a href='QLDon.php?action=xoa&id=" . $don['id'] . "' class='btn-xoa' onclick=\"return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');\">Xóa</a>
-    </div>
-</td>";
-
+            <div style='display: inline-flex; gap: 5px;'>
+                <a href='QLDon.php?action=sua&id=" . $don['id'] . "' class='btn-sua'>Sửa</a>
+                <a href='QLDon.php?action=xoa&id=" . $don['id'] . "' class='btn-xoa' onclick=\"return confirm('Bạn có chắc chắn muốn xóa đơn hàng này?');\">Xóa</a>
+            </div>
+        </td>";
         echo "</tr>";
     }
 } else {
@@ -169,8 +206,8 @@ if ($result->num_rows > 0) {
 }
 ?>
 </tbody>
-
 </table>
+
 
 <?php if ($don_hang_sua): ?>
 <div class="overlay">

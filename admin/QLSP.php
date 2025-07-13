@@ -75,7 +75,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
             <th>Danh mục</th>
             <th>Thao tác</th>
         </tr>
-
+        <?php if ($result->num_rows === 0): ?>
+            <tr>
+                <td colspan="7">Không có sản phẩm nào.</td>
+            </tr>
+        <?php else: ?>
         <?php while ($row = $result->fetch_assoc()): ?>
         <tr>
             <td><?= $row['id'] ?></td>
@@ -98,7 +102,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'xoa' && isset($_GET['id'])) {
             </td>
         </tr>
         <?php endwhile; ?>
-
+<?php endif; ?>
     </table>
 
 </body>
